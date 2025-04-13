@@ -1,0 +1,128 @@
+const { GameModel } = require('../models/game.model');
+
+const addGame = async (req, res) => {
+    try {
+        // Validate required fields
+        const requiredFields = ['title', 'description', 'url'];
+        for (const field of requiredFields) {
+            if (!req.body[field]) {
+                return res.status(400).json({
+                    success: false,
+                    error: `Missing required field: ${field}`
+                });
+            }
+        }
+
+        // Check if game with same title already exists
+        const existingGameTitle = await GameModel.findOne({ title: req.body.title });
+        if (existingGameTitle) {
+            return res.status(400).json({
+                success: false,
+                error: 'A game with this title already exists'
+            });
+        }
+
+        // Generate unique gameId with timestamp and random suffix
+        const generateUniqueId = () => {
+            const timestamp = Date.now();
+            const random = Math.floor(Math.random() * 1000);
+            return `${timestamp}-${random}`;
+        };
+
+        // Use provided ID or generate a unique one
+        const gameId = req.body.id || generateUniqueId();
+
+        // Create game object
+        const gameData = {
+            ...req.body,
+            gameId
+        };
+
+        const game = new GameModel(gameData);
+        await game.save();
+        res.status(201).json({ 
+            success: true, 
+            message: 'Game added successfully',
+            game 
+        });
+    } catch (error) {
+        console.error('Error adding game:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: error.message || 'Error adding game'
+        });
+    }
+};
+
+const getGames = async (req, res) => {
+    try {
+        const games = await GameModel.find();
+        res.status(200).json({ 
+            success: true, 
+            games 
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            error: 'Error fetching games' 
+        });
+    }
+};
+
+const getGameById = async (req, res) => {
+    try {
+        const game = await GameModel.findOne({ gameId: req.params.id });
+        if (!game) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Game not found' 
+            });
+        }
+        res.status(200).json({ 
+            success: true, 
+            game 
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            error: 'Error fetching game' 
+        });
+    }
+};
+
+const updateGame = async (req, res) => {
+    try {
+        const game = await GameModel.findOneAndUpdate(
+            { gameId: req.params.id },
+            req.body,
+            { new: true }
+        );
+        res.status(200).json({ 
+            success: true, 
+            message: 'Game updated successfully',
+            game 
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            error: 'Error updating game' 
+        });
+    }
+};
+
+const deleteGame = async (req, res) => {
+    try {
+        await GameModel.findOneAndDelete({ gameId: req.params.id });
+        res.status(200).json({ 
+            success: true, 
+            message: 'Game deleted successfully' 
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            error: 'Error deleting game' 
+        });
+    }
+};
+
+module.exports = { addGame, getGames, getGameById, updateGame, deleteGame };
