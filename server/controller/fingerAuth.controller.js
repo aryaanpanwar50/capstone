@@ -6,10 +6,14 @@ const challenges = new Map();
 const generateAuthOptions = (req, res) => {
     const challenge = crypto.randomBytes(32).toString('base64');
     challenges.set(req.sessionID, challenge);
-    
+
+    // Dynamically determine the rpId
+    const host = req.get('host'); // e.g., capstone-puce-rho.vercel.app
+    const isLocalhost = host.includes('localhost');
+
     const options = {
         challenge: Buffer.from(challenge, 'base64'),
-        rpId: 'localhost',
+        rpId: isLocalhost ? 'localhost' : 'capstone-puce-rho.vercel.app',
         userVerification: 'required',
         timeout: 60000,
     };
