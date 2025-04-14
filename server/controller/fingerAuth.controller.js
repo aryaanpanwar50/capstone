@@ -1,35 +1,52 @@
 const crypto = require('crypto');
 require('dotenv').config();
 
-// Simple in-memory storage for challenges
+// In-memory storage for demo only
 const challenges = new Map();
 
 const generateAuthOptions = (req, res) => {
-    const challenge = crypto.randomBytes(32).toString('base64');
-    challenges.set(req.sessionID, challenge);
+    const sessionID = req.sessionID;
 
-    const fullHost = req.get('host'); // e.g., "localhost:8080" or "capstone-puce-rho.vercel.app"
-    const hostname = fullHost.split(':')[0]; // strips off any port
+    if (!sessionID) {
+        return res.status(400).json({ error: 'Session ID is missing. Is express-session configured?' });
+    }
+
+    const challenge = crypto.randomBytes(32).toString('base64url');
+    challenges.set(sessionID, challenge);
+
+    const fullHost = req.get('host'); // e.g., localhost:8080 or vercel.app
+    const hostname = fullHost.split(':')[0];
     const isLocalhost = hostname.includes('localhost');
 
     const rpId = isLocalhost ? 'localhost' : process.env.RP_ID || hostname;
 
     const options = {
-        challenge: Buffer.from(challenge, 'base64'),
+        challenge: challenge,
         rpId,
         userVerification: 'required',
         timeout: 60000,
     };
 
-    console.log('Generated challenge for session:', req.sessionID);
+    console.log('Generated challenge for session:', sessionID);
     console.log('Sending rpId:', rpId);
 
     res.json(options);
 };
 
 const verifyAuthentication = (req, res) => {
-    // In a real application, verify the response using user's publicKeyCredential
-    console.log('Authentication response:', req.body);
+    const sessionID = req.sessionID;
+
+    if (!sessionID || !challenges.has(sessionID)) {
+        return res.status(400).json({ error: 'No matching challenge found for this session.' });
+    }
+
+    const challenge = challenges.get(sessionID);
+    console.log('Authenticating with challenge:', challenge);
+    console.log('Client response:', req.body);
+
+    // TODO: Actually verify the authentication (using @simplewebauthn/server)
+
+    challenges.delete(sessionID); // Clean up
     res.json({ verified: true });
 };
 
