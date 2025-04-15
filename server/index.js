@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+// const RedisStore = require('connect-redis')(session); // Removed temp
+// const redis = require('redis');
 const { connectDB } = require('./config/db');
 const { userRouter } = require('./routes/user.routes');
 const { gameRouter } = require('./routes/game.routes');
@@ -18,17 +20,17 @@ app.use(cookieParser());
 
 // Enable CORS with credentials for local + deployed frontends
 app.use(cors({
-  origin: ['http://localhost:5174', 'https://capstone-puce-rho.vercel.app'],
+  origin: ['http://localhost:5173', 'https://capstone-puce-rho.vercel.app'],
   credentials: true
 }));
 
 // ⚠️ Session middleware required for WebAuthn
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'someDefaultSecret',
+  secret: process.env.SESSION_SECRET || 'someDefaultSecret', //MUST BE UPDATED
   resave: false,
   saveUninitialized: true,
   cookie: {
-    secure: false, // set to true if using HTTPS
+    secure: false, // CHANGE TO TRUE WHEN ON HTTPS
     sameSite: 'lax'
   }
 }));

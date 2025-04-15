@@ -1,56 +1,48 @@
+// fingerAuth.controller.js
 const crypto = require('crypto');
-require('dotenv').config();
 
-// In-memory storage for demo only
+// Simple in-memory storage for challenges (DO NOT USE IN PRODUCTION)
 const challenges = new Map();
 
 const generateAuthOptions = (req, res) => {
-    const sessionID = req.sessionID;
-
-    if (!sessionID) {
-        return res.status(400).json({ error: 'Session ID is missing. Is express-session configured?' });
-    }
-
-    const challenge = crypto.randomBytes(32).toString('base64url');
-    challenges.set(sessionID, challenge);
-
-    const fullHost = req.get('host'); // e.g., localhost:8080 or vercel.app
-    const hostname = fullHost.split(':')[0];
-    const isLocalhost = hostname.includes('localhost');
-
-    const rpId = isLocalhost ? 'localhost' : process.env.RP_ID || hostname;
-
+    const challenge = crypto.randomBytes(32);
+    challenges.set(req.sessionID, challenge);
+  
+    const rpId = process.env.NODE_ENV === 'production'
+      ? 'capstone-puce-rho.vercel.app'
+      : 'localhost';
+  
     const options = {
-        challenge: challenge,
-        rpId,
+      challenge: challenge.toString('base64url'), // Encode using base64url
+      rpId: rpId,
+      userVerification: 'required',
+      timeout: 60000,
+      allowCredentials: [
+        {
+          type: 'public-key',
+          id: 'exampleCredentialIdBase64url', // You need to pass real credentialId from registration
+          transports: ['internal'], // Required for platform authenticators like Windows Hello
+        }
+      ],
+      authenticatorSelection: {
+        requireResidentKey: false,
         userVerification: 'required',
-        timeout: 60000,
+        authenticatorAttachment: 'platform',
+      },
     };
-
-    console.log('Generated challenge for session:', sessionID);
-    console.log('Sending rpId:', rpId);
-
+  
     res.json(options);
-};
+  };
+  
+
 
 const verifyAuthentication = (req, res) => {
-    const sessionID = req.sessionID;
-
-    if (!sessionID || !challenges.has(sessionID)) {
-        return res.status(400).json({ error: 'No matching challenge found for this session.' });
-    }
-
-    const challenge = challenges.get(sessionID);
-    console.log('Authenticating with challenge:', challenge);
-    console.log('Client response:', req.body);
-
-    // TODO: Actually verify the authentication (using @simplewebauthn/server)
-
-    challenges.delete(sessionID); // Clean up
-    res.json({ verified: true });
+  // In a real app, you would verify the authentication response here
+  console.log('Authentication response:', req.body);
+  res.json({ verified: true });
 };
 
 module.exports = {
-    generateAuthOptions,
-    verifyAuthentication
+  generateAuthOptions,
+  verifyAuthentication,
 };

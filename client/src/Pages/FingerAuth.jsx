@@ -15,12 +15,24 @@ const FingerprintAuth = () => {
       // Get authentication options from server
       const { data: options } = await axios.post('http://localhost:8080/finger/generate-authentication-options');
 
+      function base64urlToUint8Array(base64url) {
+        const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+        const binary = atob(base64);
+        return Uint8Array.from(binary, c => c.charCodeAt(0));
+      }
+      
+
       const credential = await navigator.credentials.get({
         publicKey: {
           ...options,
-          challenge: Uint8Array.from(options.challenge, c => c.charCodeAt(0)),
+          challenge: base64urlToUint8Array(options.challenge),
+          allowCredentials: options.allowCredentials.map(cred => ({
+            ...cred,
+            id: base64urlToUint8Array(cred.id),
+          }))
         }
       });
+      
 
       // Convert credential for sending to server
       const authResponse = {
