@@ -10,7 +10,7 @@ const { userRouter } = require('./routes/user.routes');
 const { gameRouter } = require('./routes/game.routes');
 const { friendRequestRouter } = require('./routes/friendRequest.routes');
 const { faceAuth } = require('./routes/faceAuth.routes');
-const { fingerAuthRouter } = require('./routes/fingerAuth.routes');
+
 
 const app = express();
 
@@ -40,7 +40,7 @@ app.use('/user', userRouter);
 app.use('/games', gameRouter);
 app.use('/friends', friendRequestRouter);
 app.use('/api', faceAuth);
-app.use('/finger', fingerAuthRouter);
+
 
 // Start server
 const startServer = async () => {
