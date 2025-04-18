@@ -10,7 +10,7 @@ const { userRouter } = require('./routes/user.routes');
 const { gameRouter } = require('./routes/game.routes');
 const { friendRequestRouter } = require('./routes/friendRequest.routes');
 const { faceAuth } = require('./routes/faceAuth.routes');
-
+const MongoStore  = require('connect-mongo')
 
 const app = express();
 
@@ -32,7 +32,11 @@ app.use(session({
   cookie: {
     secure: false, // CHANGE TO TRUE WHEN ON HTTPS
     sameSite: 'lax'
-  }
+  },
+  store:MongoStore.create({
+    mongoUrl:process.env.MONGO_URL,
+    collectionName:'sessions'
+  })
 }));
 
 // Routes

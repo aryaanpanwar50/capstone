@@ -51,7 +51,7 @@ const FeaturedGames = () => {
       <section className="py-16 bg-[#121212]">
         <div className="max-w-[1280px] mx-auto px-4 md:px-6">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold relative pl-4">
+            <h2 className="text-3xl font-bold text-gray-800 dark:text-white relative pl-5 group">
               <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-[#06c1ff] rounded"></span>
               Featured Games
             </h2>
@@ -69,11 +69,6 @@ const FeaturedGames = () => {
                     alt={game.title}
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-110" 
                   />
-                  {game.badge && (
-                    <div className="absolute top-2.5 right-2.5 bg-[#ff3a7c] text-white text-xs font-semibold py-0.5 px-2 rounded z-10">
-                      {game.badge}
-                    </div>
-                  )}
                 </div>
                 <div className="p-4">
                   <span className="text-xs text-[#06c1ff] block mb-1">{game.category}</span>

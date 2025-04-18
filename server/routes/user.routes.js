@@ -5,12 +5,12 @@ const { verifyToken } = require('../MiddleWare/authMiddleware');
 const userRouter = express.Router();
 
 // Public routes (no authentication required)
-userRouter.post('/auth/register', register);
-userRouter.post('/auth/login', login);
-userRouter.post('/auth/logout', logout);
+userRouter.post('/register', register);
+userRouter.post('/login', login);
+userRouter.post('/logout', logout);
 
 // Protected routes (authentication required)
-userRouter.get('/auth/me', verifyToken, getCurrentUser);
-userRouter.get('/auth/check', verifyToken, checkAuth);
+userRouter.get('/me', verifyToken, getCurrentUser);
+userRouter.get('/check', verifyToken, checkAuth);
 
 module.exports = { userRouter };
