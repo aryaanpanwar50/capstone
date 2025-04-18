@@ -27,7 +27,7 @@ const SlidingDoorLoginPage = () => {
     setError('');
     
     try {
-      const response = await fetch('http://localhost:8080/user/auth/login', {
+      const response = await fetch('http://localhost:8080/user/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -54,7 +54,7 @@ const SlidingDoorLoginPage = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8080/user/auth/register', {
+      const response = await fetch('http://localhost:8080/user/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
