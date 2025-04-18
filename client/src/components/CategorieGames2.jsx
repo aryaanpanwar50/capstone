@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import GameCard from '../components/GamrCard';
+import GameCard from './GameCard';
 
 const CategorieGames = ({ selectedCategory }) => {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filteredGames, setFilteredGames] = useState([]);
+  const [visibleGames, setVisibleGames] = useState(15);
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -51,6 +52,10 @@ const CategorieGames = ({ selectedCategory }) => {
     }
   }, [games, selectedCategory]);
 
+  const showMoreGames = () => {
+    setVisibleGames(prev => prev + 15); // Show 15 more games
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-16">
@@ -76,24 +81,13 @@ const CategorieGames = ({ selectedCategory }) => {
     );
   }
 
-  const categoryTitle = selectedCategory === 'all' ? 'All Games' : 
-    selectedCategory ? selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1) + ' Games' : 
-    'Browse Games';
-
   return (
     <section className="py-16 bg-gradient-to-b from-blue-900/5 to-blue-800/10 group">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold relative pl-4">
-            <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1.5 h-8 bg-blue-500 rounded group-hover:h-12 transition-all duration-300"></span>
-            {categoryTitle}
-          </h2>
-        </div>
-
         {/* Games Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {filteredGames.length > 0 ? (
-            filteredGames.map((game, index) => (
+            filteredGames.slice(0, visibleGames).map((game, index) => (
               <GameCard key={index} game={game} isNewRelease={true} />
             ))
           ) : (
@@ -105,6 +99,18 @@ const CategorieGames = ({ selectedCategory }) => {
             </div>
           )}
         </div>
+        
+        {/* See More Button */}
+        {filteredGames.length > visibleGames && (
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={showMoreGames}
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
+            >
+              See More
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

@@ -7,14 +7,28 @@ const GameCard = ({ game, isNewRelease = false }) => {
     }
   };
 
+  const isVideo = game.thumb?.match(/\.(mp4|webm|ogg)$/i);
+
   return isNewRelease ? (
     <div className="min-w-[110px] max-w-[180px] flex-shrink-0 bg-white/10 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:-translate-y-2 hover:shadow-lg hover:shadow-black/20">
       <div className="relative h-[180px] overflow-hidden">
-        <img
-          src={game.thumb}
-          alt={game.title}
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-        />
+        {isVideo ? (
+          <video
+            src={game.thumb}
+            alt={game.title}
+            className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+        ) : (
+          <img
+            src={game.thumb}
+            alt={game.title}
+            className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+          />
+        )}
       </div>
       <div className="p-3">
         <span className="text-xs text-[#06c1ff] block mb-1">
@@ -34,11 +48,23 @@ const GameCard = ({ game, isNewRelease = false }) => {
   ) : (
     <div className="bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:translate-y-[-8px] hover:shadow-xl hover:shadow-blue-500/10 border border-white/5">
       <div className="relative h-48 overflow-hidden group">
-        <img 
-          src={game.thumb} 
-          alt={game.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
-        />
+        {isVideo ? (
+          <video
+            src={game.thumb}
+            alt={game.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+        ) : (
+          <img 
+            src={game.thumb} 
+            alt={game.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div className="absolute bottom-4 left-4 right-4">
             <button 

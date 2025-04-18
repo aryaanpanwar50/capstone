@@ -1,6 +1,7 @@
 import { Play, Compass, Users } from 'lucide-react'
 import { FaGamepad, FaTrophy } from 'react-icons/fa'
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 
 const Hero = () => {
     const containerVariants = {
@@ -64,13 +65,15 @@ const Hero = () => {
                 >
                   <Play className="w-4 h-4" /> Play Now
                 </motion.button>
-                <motion.button 
-                  className="px-6 py-2.5 rounded-full font-semibold cursor-pointer transition-all duration-300 text-sm uppercase tracking-wider border-2 border-[#06c1ff] bg-transparent text-[#06c1ff] hover:bg-[#06c1ff] hover:text-[#0b2d72] flex items-center gap-2"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Compass className="w-4 h-4" /> Explore Categories
-                </motion.button>
+                <Link to="/categories">
+                  <motion.button 
+                    className="px-6 py-2.5 rounded-full font-semibold cursor-pointer transition-all duration-300 text-sm uppercase tracking-wider border-2 border-[#06c1ff] bg-transparent text-[#06c1ff] hover:bg-[#06c1ff] hover:text-[#0b2d72] flex items-center gap-2"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Compass className="w-4 h-4" /> Explore Categories
+                  </motion.button>
+                </Link>
               </motion.div>
               
               <motion.div 
@@ -118,4 +121,3 @@ const Hero = () => {
   }
   
   export default Hero
-  

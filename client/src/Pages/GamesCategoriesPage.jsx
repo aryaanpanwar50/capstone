@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
+import CategorieGames from '../components/CategorieGames2';
 import Header from '../components/Header';
-import Hero from '../components/Hero';
-import AppCta from '../components/AppCta';
-import Footer from '../components/Footer';
-import FeaturedGames from '../components/FeaturedGames';
-import NewReleases from '../components/NewReleases';
-import CategorieGames from '../components/CategorieGames';
 
-// Enhanced Categories component with click handling
 const Categories = ({ onCategoryClick, selectedCategory }) => {
   const categories = [
     { icon: "🎮", name: "All Games", id: "all" },
@@ -42,35 +36,20 @@ const Categories = ({ onCategoryClick, selectedCategory }) => {
   );
 };
 
-function Home() {
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  
+function GamesCategoriesPage() {
+  const [selectedCategory, setSelectedCategory] = useState('all');
+
   const handleCategoryClick = (categoryId) => {
     setSelectedCategory(categoryId);
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-[#040d21]">
       <Header />
-      <Hero />
-      <Categories 
-        onCategoryClick={handleCategoryClick} 
-        selectedCategory={selectedCategory} 
-      />
-      
-      {selectedCategory ? (
-        <CategorieGames selectedCategory={selectedCategory} />
-      ) : (
-        <>
-          <FeaturedGames />
-          <NewReleases />
-        </>
-      )}
-      
-      <AppCta />
-      <Footer />
-    </>
+      <Categories onCategoryClick={handleCategoryClick} selectedCategory={selectedCategory} />
+      <CategorieGames selectedCategory={selectedCategory} />
+    </div>
   );
 }
 
-export default Home;
+export default GamesCategoriesPage;

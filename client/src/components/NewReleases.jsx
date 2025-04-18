@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import GameCard from './GamrCard';
+import GameCard from './GameCard';
 
 const baseURL = "http://localhost:8080";
 
@@ -55,7 +55,9 @@ const NewReleases = () => {
           const timeB = new Date(b.createdAt).getTime();
           return timeB - timeA;
         });
-        setGames(sortedGames);
+        // Limit to only 10 most recent games
+        const limitedGames = sortedGames.slice(0, 10);
+        setGames(limitedGames);
         setLoading(false);
       } catch (err) {
         setError(err.message);

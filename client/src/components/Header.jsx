@@ -32,7 +32,7 @@ const Header = () => {
             {["Home", "Games", "Categories", "Top Charts", "New"].map((item, index) => (
               <motion.a
                 key={item}
-                href="#"
+                href={item === "Categories" ? "/categories" : item === "Home" ? "/home" : "#"}
                 className="text-white font-medium text-sm uppercase tracking-wider hover:text-[#06c1ff] transition-colors flex items-center gap-1"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -96,7 +96,7 @@ const Header = () => {
               {["Home", "Games", "Categories", "Top Charts", "New"].map((item, index) => (
                 <motion.a
                   key={item}
-                  href="#"
+                  href={item === "Categories" ? "/categories" : item === "Home" ? "/home" : "#"}
                   className="text-white font-medium text-sm uppercase tracking-wider flex items-center gap-2"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
