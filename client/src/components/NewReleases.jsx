@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import GameCard from './GameCard';
 
-const baseURL = "http://localhost:8080";
+const baseURL = "https://capstone-e1pm.onrender.com";
 
 // Add timeAgo function at the top
 const timeAgo = (date) => {

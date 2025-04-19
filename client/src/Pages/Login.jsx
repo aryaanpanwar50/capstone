@@ -27,7 +27,7 @@ const SlidingDoorLoginPage = () => {
     setError('');
     
     try {
-      const response = await fetch('http://localhost:8080/user/login', {
+      const response = await fetch('https://capstone-e1pm.onrender.com/user/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -54,7 +54,7 @@ const SlidingDoorLoginPage = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8080/user/register', {
+      const response = await fetch('https://capstone-e1pm.onrender.com/user/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

@@ -14,7 +14,7 @@ const CategorieGames = ({ selectedCategory }) => {
     const fetchGames = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:8080/games');
+        const response = await fetch('https://capstone-e1pm.onrender.com/games');
         
         if (!response.ok) {
           throw new Error(`Server responded with status: ${response.status}`);

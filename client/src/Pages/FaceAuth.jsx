@@ -74,7 +74,7 @@ const FaceAuth = () => {
         if (!faceEmbedding) return alert("Face not detected!");
 
         try {
-            const res = await axios.post("http://localhost:8080/api/face/signup", { email, faceEmbedding });
+            const res = await axios.post("https://capstone-e1pm.onrender.com/api/face/signup", { email, faceEmbedding });
             stopCamera();
             alert(res.data.message);
         } catch (err) {
@@ -96,7 +96,7 @@ const FaceAuth = () => {
                 return;
             }
 
-            const loginResponse = await axios.post("http://localhost:8080/api/face/login", {
+            const loginResponse = await axios.post("https://capstone-e1pm.onrender.com/api/face/login", {
                 email,
                 faceEmbedding
             });

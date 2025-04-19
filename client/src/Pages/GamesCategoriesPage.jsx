@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CategorieGames from '../components/CategorieGames2';
 import Header from '../components/Header';
 
@@ -38,16 +38,40 @@ const Categories = ({ onCategoryClick, selectedCategory }) => {
 
 function GamesCategoriesPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [loading, setLoading] = useState(false);
+  const [games, setGames] = useState([]);
 
   const handleCategoryClick = (categoryId) => {
     setSelectedCategory(categoryId);
   };
 
+  useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('https://capstone-e1pm.onrender.com/games');
+        
+        if (!response.ok) {
+          throw new Error(`Server responded with status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setGames(data);
+      } catch (error) {
+        console.error('Error fetching games:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGames();
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#040d21]">
       <Header />
       <Categories onCategoryClick={handleCategoryClick} selectedCategory={selectedCategory} />
-      <CategorieGames selectedCategory={selectedCategory} />
+      <CategorieGames selectedCategory={selectedCategory} games={games} loading={loading} />
     </div>
   );
 }

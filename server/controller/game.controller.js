@@ -125,4 +125,51 @@ const deleteGame = async (req, res) => {
     }
 };
 
-module.exports = { addGame, getGames, getGameById, updateGame, deleteGame };
+const getGameCount = async (req, res) => {
+    try {
+        const game = await GameModel.findOne({ gameId: req.params.id });
+        if (!game) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Game not found' 
+            });
+        }
+        res.status(200).json({ 
+            success: true, 
+            count: game.count 
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            error: 'Error fetching game count' 
+        });
+    }
+};
+
+const updateGameCount = async (req, res) => {
+    try {
+        const game = await GameModel.findOneAndUpdate(
+            { gameId: req.params.id },
+            { $inc: { count: 1 } },
+            { new: true }
+        );
+        if (!game) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Game not found' 
+            });
+        }
+        res.status(200).json({ 
+            success: true, 
+            message: 'Game count updated successfully',
+            count: game.count 
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            error: 'Error updating game count' 
+        });
+    }
+};
+
+module.exports = { addGame, getGames, getGameById, updateGame, deleteGame, getGameCount, updateGameCount };
