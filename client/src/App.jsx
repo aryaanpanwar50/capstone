@@ -4,9 +4,8 @@ import Login from './Pages/Login'
 import Home from './Pages/Home'
 import FaceAuth from './Pages/FaceAuth'
 import FingerAuth from './Pages/FingerAuth'
-// import CategorieGames from './components/CategorieGames';
 import GamesCategoriesPage from './Pages/GamesCategoriesPage';
-
+import TopChart from './Pages/TopChart';
 
 function App() {
   return (
@@ -17,8 +16,8 @@ function App() {
         <Route path="/face-auth" element={<FaceAuth />} />
         <Route path="/finger-auth" element={<FingerAuth />} />
         <Route path="/home" element={<Home />} />
-        {/* <Route path='/categories'element={<CategorieGames></CategorieGames>}></Route> */}
-        <Route path='/categories' element={<GamesCategoriesPage></GamesCategoriesPage>}></Route>
+        <Route path='/categories' element={<GamesCategoriesPage />} />
+        <Route path='/top-charts' element={<TopChart />} />
       </Routes>
     </Router>
   )

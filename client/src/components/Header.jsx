@@ -7,6 +7,15 @@ import { useNavigate } from 'react-router-dom'
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const navigate = useNavigate()
+
+  const getNavPath = (item) => {
+    switch(item) {
+      case "Home": return "/home";
+      case "Categories": return "/categories";
+      case "Top Charts": return "/top-charts";
+      default: return "#";
+    }
+  }
   
   return (
     <motion.header 
@@ -21,6 +30,8 @@ const Header = () => {
             className="flex items-center gap-3"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={() => navigate('/home')}
+            style={{ cursor: 'pointer' }}
           >
             <div className="w-10 h-10 bg-[#06c1ff] rounded-lg flex items-center justify-center text-[#0b2d72] font-bold text-2xl">
               <FaGamepad className="w-6 h-6" />
@@ -32,13 +43,11 @@ const Header = () => {
             {["Home", "Games", "Categories", "Top Charts", "New"].map((item, index) => (
               <motion.a
                 key={item}
-                href={item === "Categories" ? "/categories" : item === "Home" ? "/home" : "#"}
-                className="text-white font-medium text-sm uppercase tracking-wider hover:text-[#06c1ff] transition-colors flex items-center gap-1"
+                onClick={() => navigate(getNavPath(item))}
+                className="text-white font-medium text-sm uppercase tracking-wider hover:text-[#06c1ff] transition-colors flex items-center gap-1 cursor-pointer"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
               >
                 {item === "Home" && <Gamepad2 className="w-4 h-4" />}
                 {item === "Games" && <FaGamepad className="w-4 h-4" />}
@@ -49,7 +58,7 @@ const Header = () => {
               </motion.a>
             ))}
           </div>
-          
+
           <div className="flex items-center gap-4">
             <motion.div
               whileHover={{ scale: 1.1 }}
@@ -96,8 +105,11 @@ const Header = () => {
               {["Home", "Games", "Categories", "Top Charts", "New"].map((item, index) => (
                 <motion.a
                   key={item}
-                  href={item === "Categories" ? "/categories" : item === "Home" ? "/home" : "#"}
-                  className="text-white font-medium text-sm uppercase tracking-wider flex items-center gap-2"
+                  onClick={() => {
+                    navigate(getNavPath(item));
+                    setIsMenuOpen(false);
+                  }}
+                  className="text-white font-medium text-sm uppercase tracking-wider flex items-center gap-2 cursor-pointer"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}

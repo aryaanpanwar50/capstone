@@ -22,23 +22,7 @@ const addGame = async (req, res) => {
             });
         }
 
-        // Generate unique gameId with timestamp and random suffix
-        const generateUniqueId = () => {
-            const timestamp = Date.now();
-            const random = Math.floor(Math.random() * 1000);
-            return `${timestamp}-${random}`;
-        };
-
-        // Use provided ID or generate a unique one
-        const gameId = req.body.id || generateUniqueId();
-
-        // Create game object
-        const gameData = {
-            ...req.body,
-            gameId
-        };
-
-        const game = new GameModel(gameData);
+        const game = new GameModel(req.body);
         await game.save();
         res.status(201).json({ 
             success: true, 
@@ -71,7 +55,7 @@ const getGames = async (req, res) => {
 
 const getGameById = async (req, res) => {
     try {
-        const game = await GameModel.findOne({ gameId: req.params.id });
+        const game = await GameModel.findById(req.params.id);
         if (!game) {
             return res.status(404).json({ 
                 success: false, 
@@ -92,11 +76,17 @@ const getGameById = async (req, res) => {
 
 const updateGame = async (req, res) => {
     try {
-        const game = await GameModel.findOneAndUpdate(
-            { gameId: req.params.id },
+        const game = await GameModel.findByIdAndUpdate(
+            req.params.id,
             req.body,
             { new: true }
         );
+        if (!game) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Game not found' 
+            });
+        }
         res.status(200).json({ 
             success: true, 
             message: 'Game updated successfully',
@@ -112,7 +102,13 @@ const updateGame = async (req, res) => {
 
 const deleteGame = async (req, res) => {
     try {
-        await GameModel.findOneAndDelete({ gameId: req.params.id });
+        const game = await GameModel.findByIdAndDelete(req.params.id);
+        if (!game) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Game not found' 
+            });
+        }
         res.status(200).json({ 
             success: true, 
             message: 'Game deleted successfully' 
@@ -127,7 +123,7 @@ const deleteGame = async (req, res) => {
 
 const getGameCount = async (req, res) => {
     try {
-        const game = await GameModel.findOne({ gameId: req.params.id });
+        const game = await GameModel.findById(req.params.id);
         if (!game) {
             return res.status(404).json({ 
                 success: false, 
@@ -148,8 +144,8 @@ const getGameCount = async (req, res) => {
 
 const updateGameCount = async (req, res) => {
     try {
-        const game = await GameModel.findOneAndUpdate(
-            { gameId: req.params.id },
+        const game = await GameModel.findByIdAndUpdate(
+            req.params.id,
             { $inc: { count: 1 } },
             { new: true }
         );
@@ -172,4 +168,24 @@ const updateGameCount = async (req, res) => {
     }
 };
 
-module.exports = { addGame, getGames, getGameById, updateGame, deleteGame, getGameCount, updateGameCount };
+const getAllGameCounts = async (req, res) => {
+    try {
+        const games = await GameModel.find({}, '_id title count updatedAt');
+        res.status(200).json({ 
+            success: true, 
+            games: games.map(game => ({
+                _id: game._id,
+                title: game.title,
+                count: game.count,
+                updatedAt: game.updatedAt
+            }))
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            error: 'Error fetching game counts' 
+        });
+    }
+};
+
+module.exports = { addGame, getGames, getGameById, updateGame, deleteGame, getGameCount, updateGameCount, getAllGameCounts };

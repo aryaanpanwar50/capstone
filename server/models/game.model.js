@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 
 const gameSchema = mongoose.Schema({
-    gameId: {
-        type: String,
-        required: true,
-        unique: true
-    },
     title: {
         type: String,
         required: true
