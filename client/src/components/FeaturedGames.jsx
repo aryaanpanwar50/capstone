@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { API_URL } from '../config';
 
 const FeaturedGames = () => {
   const [games, setGames] = useState([]);
@@ -6,7 +7,7 @@ const FeaturedGames = () => {
   useEffect(() => {
     const fetchFeaturedGames = async () => {
       try {
-        const response = await fetch('https://capstone-e1pm.onrender.com/games/featured');
+        const response = await fetch(`${API_URL}/games/featured`);
         if (!response.ok) throw new Error('Failed to fetch featured games');
         const data = await response.json();
         setGames(data);

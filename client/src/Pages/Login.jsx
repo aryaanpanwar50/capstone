@@ -14,6 +14,7 @@ import {
   ChevronRight,
   ArrowRight
 } from 'lucide-react';
+import { API_URL } from '../config';
 
 const SlidingDoorLoginPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -27,7 +28,7 @@ const SlidingDoorLoginPage = () => {
     setError('');
     
     try {
-      const response = await fetch('http://localhost:8080/user/login', {
+      const response = await fetch(`${API_URL}/user/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -55,7 +56,7 @@ const SlidingDoorLoginPage = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8080/user/register', {
+      const response = await fetch(`${API_URL}/user/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -253,7 +254,7 @@ const SlidingDoorLoginPage = () => {
                   
                   <div className="mt-6 grid grid-cols-3 gap-3">
                     <button 
-                      onClick={() => window.location.href = 'http://localhost:8080/auth/google'}
+                      onClick={() => window.location.href = `${API_URL}/auth/google`}
                       className="w-full inline-flex justify-center py-2 px-4 border border-white/20 rounded-lg shadow-sm bg-white/5 hover:bg-white/15 hover:border-white/30 hover:shadow-md transition-all duration-300"
                     >
                       <FaGoogle className="h-5 w-5 text-white" />
