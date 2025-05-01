@@ -58,7 +58,7 @@ app.use('/api', faceAuth);
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(8080, () => {
+    app.listen(PORT, () => {
       console.log('✅ Server running on port 8080');
     });
   } catch (error) {
