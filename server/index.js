@@ -3,14 +3,13 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-// const RedisStore = require('connect-redis')(session); // Removed temp
-// const redis = require('redis');
+const passport = require('./config/passport');
+const MongoStore  = require('connect-mongo');
 const { connectDB } = require('./config/db');
-const { userRouter } = require('./routes/user.routes');
+const { userRouter, authRouter } = require('./routes/user.routes');
 const { gameRouter } = require('./routes/game.routes');
 const { friendRequestRouter } = require('./routes/friendRequest.routes');
 const { faceAuth } = require('./routes/faceAuth.routes');
-const MongoStore  = require('connect-mongo')
 
 const app = express();
 
@@ -18,33 +17,41 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// Enable CORS with credentials for local + deployed frontends
+// Enable CORS with credentials for all origins
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://capstone-puce-rho.vercel.app'],
+  origin: true,
   credentials: true
 }));
 
-// ⚠️ Session middleware required for WebAuthn
+// Trust proxy - important for OAuth callbacks
+app.set('trust proxy', 1);
+
+// Session middleware
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'someDefaultSecret', //MUST BE UPDATED
+  secret: process.env.SESSION_SECRET || 'someDefaultSecret',
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: {
-    secure: false, // CHANGE TO TRUE WHEN ON HTTPS
-    sameSite: 'lax'
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'none',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
   },
-  store:MongoStore.create({
-    mongoUrl:process.env.MONGO_URL,
-    collectionName:'sessions'
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URL,
+    collectionName: 'sessions'
   })
 }));
 
+// Initialize Passport and restore authentication state from session
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Routes
+app.use('/auth', authRouter);
 app.use('/user', userRouter);
 app.use('/games', gameRouter);
 app.use('/friends', friendRequestRouter);
 app.use('/api', faceAuth);
-
 
 // Start server
 const startServer = async () => {

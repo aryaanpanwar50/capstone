@@ -27,7 +27,7 @@ const SlidingDoorLoginPage = () => {
     setError('');
     
     try {
-      const response = await fetch('https://capstone-e1pm.onrender.com/user/login', {
+      const response = await fetch('http://localhost:8080/user/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -37,9 +37,10 @@ const SlidingDoorLoginPage = () => {
       const data = await response.json();
       
       if (response.ok) {
-        // Store token if needed
-        localStorage.setItem('token', data.token);
-        navigate('/home');
+        // Check for redirect path from protected route attempt
+        const redirectPath = sessionStorage.getItem('redirectPath');
+        sessionStorage.removeItem('redirectPath'); // Clear it after use
+        navigate(redirectPath || '/home');
       } else {
         setError(data.msg || 'Login failed');
       }
@@ -54,7 +55,7 @@ const SlidingDoorLoginPage = () => {
     setError('');
 
     try {
-      const response = await fetch('https://capstone-e1pm.onrender.com/user/register', {
+      const response = await fetch('http://localhost:8080/user/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -251,7 +252,10 @@ const SlidingDoorLoginPage = () => {
                   </div>
                   
                   <div className="mt-6 grid grid-cols-3 gap-3">
-                    <button className="w-full inline-flex justify-center py-2 px-4 border border-white/20 rounded-lg shadow-sm bg-white/5 hover:bg-white/15 hover:border-white/30 hover:shadow-md transition-all duration-300">
+                    <button 
+                      onClick={() => window.location.href = 'http://localhost:8080/auth/google'}
+                      className="w-full inline-flex justify-center py-2 px-4 border border-white/20 rounded-lg shadow-sm bg-white/5 hover:bg-white/15 hover:border-white/30 hover:shadow-md transition-all duration-300"
+                    >
                       <FaGoogle className="h-5 w-5 text-white" />
                     </button>
                     <button className="w-full inline-flex justify-center py-2 px-4 border border-white/20 rounded-lg shadow-sm bg-white/5 hover:bg-white/15 hover:border-white/30 hover:shadow-md transition-all duration-300">

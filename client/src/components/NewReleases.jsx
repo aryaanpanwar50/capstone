@@ -104,11 +104,11 @@ const NewReleases = () => {
     );
 
   return (
-    <section className="py-16 bg-gradient-to-b from-blue-900/5 to-blue-800/10 group">
+    <section className="py-16 bg-gradient-to-b from-blue-900/5 to-blue-800/10 group relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-10">
           <h2 className="text-2xl md:text-3xl font-bold relative pl-4">
-            <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1.5 h-8 bg-blue-500 rounded group-hover:h-12 transition-all duration-300"></span>
+            <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-8 bg-blue-500 rounded group-hover:h-12 transition-all duration-300"></span>
             New Releases
           </h2>
           <a
@@ -133,11 +133,13 @@ const NewReleases = () => {
           </a>
         </div>
 
-        <div className="relative">          
+        <div className="relative group">
           {/* Left Arrow */}
           <button
             onClick={() => scroll("left")}
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-gray-800/80 rounded-full p-2 shadow-lg z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-white dark:hover:bg-gray-800"
+            className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-gray-800/90 rounded-full p-2 shadow-lg z-20 opacity-80 hover:opacity-100 transition-opacity duration-300 border border-gray-200 dark:border-gray-700"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            aria-label="Scroll Left"
           >
             <svg
               className="w-6 h-6 text-gray-800 dark:text-white"
@@ -157,7 +159,9 @@ const NewReleases = () => {
           {/* Right Arrow */}
           <button
             onClick={() => scroll("right")}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-gray-800/80 rounded-full p-2 shadow-lg z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-white dark:hover:bg-gray-800"
+            className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-gray-800/90 rounded-full p-2 shadow-lg z-20 opacity-80 hover:opacity-100 transition-opacity duration-300 border border-gray-200 dark:border-gray-700"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            aria-label="Scroll Right"
           >
             <svg
               className="w-6 h-6 text-gray-800 dark:text-white"
@@ -177,8 +181,26 @@ const NewReleases = () => {
           <div
             ref={scrollContainerRef}
             className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            style={{
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+              WebkitOverflowScrolling: "touch",
+              paddingLeft: "2.5rem",
+              paddingRight: "2.5rem"
+            }}
           >
+            {/* Hide scrollbar for all browsers */}
+            <style>
+              {`
+                .scrollbar-hide::-webkit-scrollbar {
+                  display: none;
+                }
+                .scrollbar-hide {
+                  -ms-overflow-style: none;
+                  scrollbar-width: none;
+                }
+              `}
+            </style>
             {games.map((game, index) => (
               <GameCard key={index} game={game} isNewRelease={true} />
             ))}

@@ -74,7 +74,7 @@ const FaceAuth = () => {
         if (!faceEmbedding) return alert("Face not detected!");
 
         try {
-            const res = await axios.post("https://capstone-e1pm.onrender.com/api/face/signup", { email, faceEmbedding });
+            const res = await axios.post("http://localhost:8080/api/face/signup", { email, faceEmbedding });
             stopCamera();
             alert(res.data.message);
         } catch (err) {
@@ -96,12 +96,14 @@ const FaceAuth = () => {
                 return;
             }
 
-            const loginResponse = await axios.post("https://capstone-e1pm.onrender.com/api/face/login", {
+            const loginResponse = await axios.post("http://localhost:8080/api/face/login", {
                 email,
                 faceEmbedding
+            }, {
+                withCredentials: true // This ensures cookies are sent and received
             });
 
-            const { verified, similarity, message, token, threshold } = loginResponse.data;
+            const { verified, similarity, message, threshold } = loginResponse.data;
 
             setVerificationStatus({
                 success: verified,
@@ -113,16 +115,15 @@ const FaceAuth = () => {
 
             if (verified) {
                 stopCamera();
-                localStorage.setItem("token", token);
-                localStorage.setItem("userEmail", email);
                 setTimeout(() => {
                     navigate("/home");
                 }, 1500);
             }
         } catch (err) {
+            const errorMessage = err.response?.data?.message || "Face verification failed";
             setVerificationStatus({
                 success: false,
-                message: err.response?.data?.message || "Face verification failed"
+                message: errorMessage
             });
         } finally {
             setIsVerifying(false);

@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { UserModel } = require('../models/user.model');
+const { createTokens } = require('../MiddleWare/authMiddleware');
 
 // Function to generate a random 10-digit number
 const generateTenDigitId = () => {
@@ -56,7 +57,7 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         
-        const user = await UserModel.findOne({ email });
+        const user = await UserModel.findOne({ email }).populate('friends');
         if (!user) {
             return res.status(404).json({ 
                 success: false,
@@ -72,27 +73,33 @@ const login = async (req, res) => {
             });
         }
 
-        const token = jwt.sign(
-            { userId: user._id, email: user.email }, 
-            process.env.JWT_SECRET || 'secret', 
-            { expiresIn: '1h' }
-        );
+        // Generate access and refresh tokens
+        const { accessToken, refreshToken } = createTokens(user);
 
-        // Set JWT token in cookie
-        res.cookie('token', token, {
-            httpOnly: true,            // Prevents client-side JS from reading the cookie
-            secure: process.env.NODE_ENV === 'production',  // Use HTTPS in production
-            sameSite: 'lax',           // Controls when cookies are sent with cross-site requests
-            maxAge: 3600000            // Cookie expiry (1 hour in milliseconds)
+        // Set tokens in cookies
+        res.cookie('token', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 3600000 // 1 hour
+        });
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
         res.status(200).json({ 
             success: true,
-            token,                     // Still sending token in response for client storage if needed
+            token: accessToken, // Send token in response for localStorage
             user: {
                 id: user._id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                profilePicture: user.profilePicture,
+                friends: user.friends
             }
         });
     } catch (error) {
@@ -106,22 +113,28 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
     try {
-        // Get the token from cookies
-        const token = req.cookies.token;
-
-        if (token) {
-            // TODO: In a production environment, you should:
-            // 1. Add the token to a blacklist in Redis/database
-            // 2. Or maintain a list of revoked tokens until their natural expiration
-        }
-
-        // Clear the token cookie
+        // Clear auth cookies
         res.clearCookie('token', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax'
+            sameSite: 'lax',
+            path: '/'
         });
         
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/'
+        });
+
+        // Clear any other session-related cookies if they exist
+        Object.keys(req.cookies).forEach(cookieName => {
+            res.clearCookie(cookieName, {
+                path: '/'
+            });
+        });
+
         res.status(200).json({
             success: true,
             message: 'Logged out successfully'
@@ -183,4 +196,62 @@ const checkAuth = async (req, res) => {
     });
 };
 
-module.exports = { register, login, logout, getCurrentUser, checkAuth };
+const refreshAccessToken = async (req, res) => {
+    try {
+        const refreshToken = req.cookies.refreshToken;
+        
+        if (!refreshToken) {
+            return res.status(401).json({
+                success: false,
+                message: 'Refresh token not found'
+            });
+        }
+
+        const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET || 'refresh-secret');
+        const user = await UserModel.findById(decoded.userId);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // Generate new tokens
+        const { accessToken: newAccessToken, refreshToken: newRefreshToken } = createTokens(user);
+
+        // Set new tokens in cookies
+        res.cookie('token', newAccessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 3600000
+        });
+
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+        res.json({
+            success: true,
+            accessToken: newAccessToken
+        });
+    } catch (error) {
+        console.error('Token refresh error:', error);
+        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid refresh token'
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+};
+
+module.exports = { register, login, logout, getCurrentUser, checkAuth, refreshAccessToken };

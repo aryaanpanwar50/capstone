@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
 const userSchema = mongoose.Schema({
-  name:{
-    type : String,
+  name: {
+    type: String,
     required: true,
   }, 
   email: {
@@ -12,7 +12,14 @@ const userSchema = mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: false, // Changed to false since Google auth users won't have a password
+  },
+  googleId: {
+    type: String,
+    sparse: true, // Allows null/undefined but ensures uniqueness for non-null values
+  },
+  profilePicture: {
+    type: String,
   },
   friends: [{
     type: mongoose.Schema.Types.ObjectId,

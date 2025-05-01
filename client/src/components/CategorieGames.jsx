@@ -90,15 +90,15 @@ const CategorieGames = ({ selectedCategory }) => {
 
 
   return (
-    <section className="py-16 bg-gradient-to-b from-blue-900/5 to-blue-800/10 group">
+    <section className="py-16 bg-gradient-to-b from-blue-900/5 to-blue-800/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-
         {/* Games Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {filteredGames.length > 0 ? (
             filteredGames.slice(0, visibleGames).map((game, index) => (
-              <GameCard key={index} game={game} isNewRelease={true} />
+              <div key={index}>
+                <GameCard game={game} isNewRelease={true} />
+              </div>
             ))
           ) : (
             <div className="col-span-full py-16 text-center text-gray-400">
@@ -112,10 +112,10 @@ const CategorieGames = ({ selectedCategory }) => {
         
         {/* See More Button */}
         {filteredGames.length > visibleGames && (
-          <div className="flex justify-center mt-8">
+          <div className="flex justify-center mt-4">
             <button
               onClick={showMoreGames}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
             >
               See More
             </button>
