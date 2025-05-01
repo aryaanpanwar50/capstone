@@ -19,7 +19,7 @@ passport.deserializeUser(async (id, done) => {
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "https://your-render-service.onrender.com/auth/google/callback",
+    callbackURL: "https://capstone-e1pm.onrender.com/auth/google/callback",
 
     proxy: true
 },
