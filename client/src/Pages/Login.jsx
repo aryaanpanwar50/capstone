@@ -14,7 +14,9 @@ import {
   ChevronRight,
   ArrowRight
 } from 'lucide-react';
-import { API_URL } from '../config';
+// import { API_URL } from '../config';
+
+const API_URL = 'http://localhost:8080'
 
 const SlidingDoorLoginPage = () => {
   const [isLogin, setIsLogin] = useState(true);

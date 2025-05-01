@@ -19,29 +19,43 @@ passport.deserializeUser(async (id, done) => {
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.NODE_ENV === 'production' 
-        ? "https://capstone-e1pm.onrender.com/auth/google/callback"
-        : "http://localhost:8080/auth/google/callback",
+    callbackURL: process.env.NODE_ENV === 'production'
+        ? 'http://localhost:8080/auth/google/callback'
+        : 'http://localhost:8080/auth/google/callback',
     proxy: true
 },
 async (accessToken, refreshToken, profile, done) => {
     try {
         // Check if user already exists
-        let user = await UserModel.findOne({ googleId: profile.id });
+        let user = await UserModel.findOne({ 
+            $or: [
+                { googleId: profile.id },
+                { email: profile.emails[0].value }
+            ]
+        });
         
-        if (!user) {
+        if (user) {
+            // Update existing user's Google ID if they signed up with email first
+            if (!user.googleId) {
+                user.googleId = profile.id;
+                user.profilePicture = profile.photos[0].value;
+                await user.save();
+            }
+        } else {
             // Create new user if doesn't exist
             user = await UserModel.create({
                 googleId: profile.id,
                 name: profile.displayName,
                 email: profile.emails[0].value,
-                password: null, // Google authenticated users don't need a password
-                profilePicture: profile.photos[0].value
+                password: null,
+                profilePicture: profile.photos[0].value,
+                verified: true // Google users are automatically verified
             });
         }
         
         return done(null, user);
     } catch (error) {
+        console.error('Google Auth Error:', error);
         return done(error, null);
     }
 }));

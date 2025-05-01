@@ -3,7 +3,6 @@ import { Search, Menu, X, Gamepad2, Trophy, Star, Sparkles } from 'lucide-react'
 import { FaGamepad } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { API_URL } from '../config'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -13,7 +12,7 @@ const Header = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch(`${API_URL}/user/check`, {
+        const response = await fetch('http://localhost:8080/user/check', {
           method: 'GET',
           credentials: 'include', // This ensures cookies are sent
           headers: {
@@ -33,7 +32,7 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${API_URL}/user/logout`, {
+      const response = await fetch('http://localhost:8080/user/logout', {
         method: 'POST',
         credentials: 'include',
         headers: {
