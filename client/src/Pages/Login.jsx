@@ -14,9 +14,7 @@ import {
   ChevronRight,
   ArrowRight
 } from 'lucide-react';
-// import { API_URL } from '../config';
-
-const API_URL = 'http://localhost:8080'
+import { API_URL, tryAPI } from '../config';
 
 const SlidingDoorLoginPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -30,26 +28,22 @@ const SlidingDoorLoginPage = () => {
     setError('');
     
     try {
-      const response = await fetch(`${API_URL}/user/login`, {
+      const response = await tryAPI('/user/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(loginData)
       });
 
       const data = await response.json();
-      
       if (response.ok) {
-        // Check for redirect path from protected route attempt
         const redirectPath = sessionStorage.getItem('redirectPath');
-        sessionStorage.removeItem('redirectPath'); // Clear it after use
+        sessionStorage.removeItem('redirectPath');
         navigate(redirectPath || '/home');
       } else {
-        setError(data.msg || 'Login failed');
+        setError(data.message || 'Login failed');
       }
     } catch (error) {
-      setError('Network error occurred');
       console.error('Login error:', error);
+      setError(error.message || 'Network error occurred');
     }
   };
 
@@ -57,26 +51,31 @@ const SlidingDoorLoginPage = () => {
     e.preventDefault();
     setError('');
 
-    try {
-      const response = await fetch(`${API_URL}/user/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(signupData)
-      });
+    for (const baseUrl of API_URLS) {
+        try {
+            const response = await fetch(`${baseUrl}/user/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(signupData)
+            });
 
-      const data = await response.json();
-      
-      if (response.ok) {
-        setIsLogin(true); // Switch to login form
-        alert('Registration successful! Please login.');
-      } else {
-        setError(data.msg || 'Registration failed');
-      }
-    } catch (error) {
-      setError('Network error occurred');
-      console.error('Signup error:', error);
+            const data = await response.json();
+            
+            if (response.ok) {
+                setIsLogin(true);
+                alert('Registration successful! Please login.');
+                return;
+            }
+        } catch (error) {
+            console.log(`Failed with ${baseUrl}:`, error);
+        }
     }
+    setError('Registration failed with all endpoints');
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${API_URL}/auth/google`;
   };
 
   return (

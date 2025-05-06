@@ -9,6 +9,7 @@ import FingerAuth from './Pages/FingerAuth'
 import GamesCategoriesPage from './Pages/GamesCategoriesPage';
 import TopChart from './Pages/TopChart';
 import Desc from './Pages/Desc';
+import { API_URL, fetchOptions } from './config';
 
 // Handle auth callback
 const AuthCallback = () => {
@@ -28,44 +29,36 @@ const AuthCallback = () => {
   return <div>Loading...</div>;
 };
 
+const verifyAuth = async () => {
+  try {
+    const [regularAuthResponse, faceAuthResponse] = await Promise.all([
+      fetch(`${API_URL}/user/check`, fetchOptions),
+      fetch(`${API_URL}/faceAuth/verify-auth`, fetchOptions)
+    ]);
+
+    return regularAuthResponse.ok || faceAuthResponse.ok;
+  } catch (error) {
+    console.error('Auth verification failed:', error);
+    return false;
+  }
+};
+
 // ProtectedRoute component to check authentication
 const ProtectedRoute = ({ children }) => {
   const navigate = useNavigate();
   const [isVerifying, setIsVerifying] = useState(true);
 
   useEffect(() => {
-    const verifyAuth = async () => {
-      try {
-        // Try both regular auth and face auth
-        const [regularAuthResponse, faceAuthResponse] = await Promise.allSettled([
-          fetch('http://localhost:8080/user/check', {
-            credentials: 'include'
-          }),
-          fetch('http://localhost:8080/faceAuth/verify-auth', {
-            credentials: 'include'
-          })
-        ]);
-
-        // Check if either authentication method is valid
-        const isAuthenticated = (
-          regularAuthResponse.status === 'fulfilled' && regularAuthResponse.value.ok
-        ) || (
-          faceAuthResponse.status === 'fulfilled' && faceAuthResponse.value.ok
-        );
-
-        if (!isAuthenticated) {
-          navigate('/login', { replace: true });
-          return;
-        }
-
-        setIsVerifying(false);
-      } catch (error) {
-        console.error('Auth verification error:', error);
+    const verify = async () => {
+      const isAuthenticated = await verifyAuth();
+      if (!isAuthenticated) {
         navigate('/login', { replace: true });
+        return;
       }
+      setIsVerifying(false);
     };
 
-    verifyAuth();
+    verify();
   }, [navigate]);
 
   if (isVerifying) {
@@ -85,32 +78,16 @@ const AuthRoute = ({ children }) => {
   const [isVerifying, setIsVerifying] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const [regularAuthResponse, faceAuthResponse] = await Promise.allSettled([
-          fetch('http://localhost:8080/user/check', {
-            credentials: 'include'
-          }),
-          fetch('http://localhost:8080/faceAuth/verify-auth', {
-            credentials: 'include'
-          })
-        ]);
-
-        // If either auth is valid, redirect to home
-        if ((regularAuthResponse.status === 'fulfilled' && regularAuthResponse.value.ok) ||
-            (faceAuthResponse.status === 'fulfilled' && faceAuthResponse.value.ok)) {
-          navigate('/home', { replace: true });
-          return;
-        }
-        
-        setIsVerifying(false);
-      } catch (error) {
-        console.error('Auth check error:', error);
-        setIsVerifying(false);
+    const check = async () => {
+      const isAuthenticated = await verifyAuth();
+      if (isAuthenticated) {
+        navigate('/home', { replace: true });
+        return;
       }
+      setIsVerifying(false);
     };
 
-    checkAuth();
+    check();
   }, [navigate]);
 
   if (isVerifying) {

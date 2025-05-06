@@ -3,6 +3,7 @@ import { Search, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { FaGamepad } from 'react-icons/fa';
+import { API_URL, fetchOptions } from '../config';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,12 +14,8 @@ const Header = () => {
     const checkAuth = async () => {
       try {
         const [regularAuthResponse, faceAuthResponse] = await Promise.allSettled([
-          fetch('http://localhost:8080/user/check', {
-            credentials: 'include'
-          }),
-          fetch('http://localhost:8080/faceAuth/verify-auth', {
-            credentials: 'include'
-          })
+          fetch(`${API_URL}/user/check`, fetchOptions),
+          fetch(`${API_URL}/faceAuth/verify-auth`, fetchOptions)
         ]);
 
         const isAuthenticated = (
@@ -28,7 +25,6 @@ const Header = () => {
         );
 
         setIsAuthenticated(isAuthenticated);
-        
         if (!isAuthenticated) {
           navigate('/login');
         }
@@ -44,23 +40,15 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://localhost:8080/user/logout', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      const response = await fetch(`${API_URL}/user/logout`, {
+        ...fetchOptions,
+        method: 'POST'
       });
 
       if (response.ok) {
-        // Clear any local storage items if you're using them
         localStorage.clear();
         sessionStorage.clear();
-        
-        // Clear any auth state
         setIsAuthenticated(false);
-        
-        // Force reload after logout to clear any cached state
         window.location.href = '/login';
       } else {
         console.error('Logout failed:', await response.text());

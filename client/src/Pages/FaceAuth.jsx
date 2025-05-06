@@ -4,6 +4,13 @@ import { Camera, UserCheck, LogIn, Mail, Loader } from "lucide-react";
 import * as faceapi from "face-api.js";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from '../config';
+
+// Add axios default config
+axios.defaults.withCredentials = true;
+axios.defaults.headers.common['Accept'] = 'application/json';
+axios.defaults.headers.common['Content-Type'] = 'application/json';
+axios.defaults.headers.common['Origin'] = 'http://localhost:5173';
 
 const FaceAuth = () => {
     const videoRef = useRef(null);
@@ -25,14 +32,13 @@ const FaceAuth = () => {
 
     const checkExistingToken = async () => {
         try {
-            const response = await axios.get("http://localhost:8080/faceAuth/verify-auth", {
-                withCredentials: true
-            });
+            const response = await axios.get(`${API_URL}/faceAuth/verify-auth`);
+            
             if (response.data.success) {
                 navigate("/home");
             }
         } catch (error) {
-            console.log("No valid session found");
+            console.log("No valid session found", error);
         }
     };
 
@@ -87,13 +93,20 @@ const FaceAuth = () => {
         const faceEmbedding = await getFaceEmbedding();
         if (!faceEmbedding) return alert("Face not detected!");
 
-        try {
-            const res = await axios.post("http://localhost:8080/faceAuth/face/signup", { email, faceEmbedding });
-            stopCamera();
-            alert(res.data.message);
-        } catch (err) {
-            alert(err.response?.data?.message || "Error during registration");
+        for (const baseUrl of API_URLS) {
+            try {
+                const res = await axios.post(`${baseUrl}/faceAuth/face/signup`, { 
+                    email, 
+                    faceEmbedding 
+                });
+                stopCamera();
+                alert(res.data.message);
+                return;
+            } catch (error) {
+                console.log(`Failed with ${baseUrl}:`, error);
+            }
         }
+        alert("Registration failed with all endpoints");
     };
 
     const login = async () => {
@@ -110,11 +123,9 @@ const FaceAuth = () => {
                 return;
             }
 
-            const loginResponse = await axios.post("http://localhost:8080/faceAuth/face/login", {
+            const loginResponse = await axios.post(`${API_URL}/faceAuth/face/login`, {
                 email,
                 faceEmbedding
-            }, {
-                withCredentials: true
             });
 
             const { verified, similarity, message, threshold } = loginResponse.data;
@@ -136,7 +147,7 @@ const FaceAuth = () => {
                 let attempts = 0;
                 while (attempts < 3) {
                     try {
-                        const authCheck = await axios.get("http://localhost:8080/faceAuth/verify-auth", {
+                        const authCheck = await axios.get(`${API_URL}/faceAuth/verify-auth`, {
                             withCredentials: true
                         });
                         
