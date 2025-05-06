@@ -45,8 +45,13 @@ authRouter.get('/google/callback',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
+        // Use environment variable for frontend URL
+        const frontendURL = process.env.NODE_ENV === 'production' 
+            ? 'https://capstone-two-gamma.vercel.app'
+            : 'http://localhost:5173';
+            
         // Redirect to frontend with token in URL for localStorage
-        res.redirect(`http://localhost:5173/auth/callback?token=${accessToken}`);
+        res.redirect(`${frontendURL}/login/auth/callback?token=${accessToken}`);
     }
 );
 
