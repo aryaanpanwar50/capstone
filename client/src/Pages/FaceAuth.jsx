@@ -129,18 +129,29 @@ const FaceAuth = () => {
 
             if (verified) {
                 stopCamera();
-                // Check if token is properly set after login
-                const authCheck = await axios.get("http://localhost:8080/faceAuth/verify-auth", {
-                    withCredentials: true
-                });
+                // Wait for 1 second to ensure token is set
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 
-                if (authCheck.data.success) {
-                    setTimeout(() => {
-                        navigate("/home");
-                    }, 1500);
-                } else {
-                    throw new Error("Authentication failed");
+                // Retry authentication check up to 3 times
+                let attempts = 0;
+                while (attempts < 3) {
+                    try {
+                        const authCheck = await axios.get("http://localhost:8080/faceAuth/verify-auth", {
+                            withCredentials: true
+                        });
+                        
+                        if (authCheck.data.success) {
+                            navigate("/home");
+                            return;
+                        }
+                    } catch (err) {
+                        console.log(`Auth check attempt ${attempts + 1} failed`);
+                    }
+                    attempts++;
+                    // Wait 500ms between attempts
+                    await new Promise(resolve => setTimeout(resolve, 500));
                 }
+                throw new Error("Failed to verify authentication after login");
             }
         } catch (err) {
             const errorMessage = err.response?.data?.message || "Face verification failed";
