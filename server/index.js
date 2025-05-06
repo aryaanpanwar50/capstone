@@ -19,14 +19,15 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// Enable CORS with credentials for all origins
+// Enable CORS with specific origins and configuration
 app.use(cors({
-  origin: true,
-  credentials: true
+  origin: ['http://localhost:3000', 'https://capstone-two-gamma.vercel.app'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Trust proxy - important for OAuth callbacks
-app.set('trust proxy', 1);
+app.enable('trust proxy'); // Add this line for secure cookies to work
 
 // Session middleware
 app.use(session({

@@ -76,20 +76,23 @@ const login = async (req, res) => {
         // Generate access and refresh tokens
         const { accessToken, refreshToken } = createTokens(user);
 
-        // Set tokens in cookies
-        res.cookie('token', accessToken, {
+        const cookieOptions = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            secure: true,
+            sameSite: 'none',
+            path: '/',
+            domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined,
             maxAge: 3600000 // 1 hour
-        });
+        };
 
-        res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+        const refreshCookieOptions = {
+            ...cookieOptions,
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-        });
+        };
+
+        // Set tokens in cookies
+        res.cookie('token', accessToken, cookieOptions);
+        res.cookie('refreshToken', refreshToken, refreshCookieOptions);
 
         res.status(200).json({ 
             success: true,
@@ -113,26 +116,21 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
     try {
-        // Clear auth cookies
-        res.clearCookie('token', {
+        const cookieOptions = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/'
-        });
-        
-        res.clearCookie('refreshToken', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/'
-        });
+            secure: true,
+            sameSite: 'none',
+            path: '/',
+            domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
+        };
 
-        // Clear any other session-related cookies if they exist
+        // Clear auth cookies with matching options
+        res.clearCookie('token', cookieOptions);
+        res.clearCookie('refreshToken', cookieOptions);
+
+        // Clear any other session-related cookies
         Object.keys(req.cookies).forEach(cookieName => {
-            res.clearCookie(cookieName, {
-                path: '/'
-            });
+            res.clearCookie(cookieName, cookieOptions);
         });
 
         res.status(200).json({
@@ -220,20 +218,23 @@ const refreshAccessToken = async (req, res) => {
         // Generate new tokens
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } = createTokens(user);
 
-        // Set new tokens in cookies
-        res.cookie('token', newAccessToken, {
+        const cookieOptions = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 3600000
-        });
+            secure: true,
+            sameSite: 'none',
+            path: '/',
+            domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined,
+            maxAge: 3600000 // 1 hour
+        };
 
-        res.cookie('refreshToken', newRefreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
+        const refreshCookieOptions = {
+            ...cookieOptions,
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        };
+
+        // Set new tokens in cookies
+        res.cookie('token', newAccessToken, cookieOptions);
+        res.cookie('refreshToken', newRefreshCookieOptions);
 
         res.json({
             success: true,

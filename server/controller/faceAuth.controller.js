@@ -81,20 +81,22 @@ const login = async (req, res) => {
             email: faceUser.email 
         });
 
-        // Set cookies
-        res.cookie('token', accessToken, {
+        const cookieOptions = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            secure: true,
+            sameSite: 'none',
+            path: '/',
+            domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined,
             maxAge: 3600000 // 1 hour
-        });
+        };
 
-        res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+        const refreshCookieOptions = {
+            ...cookieOptions,
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-        });
+        };
+
+        res.cookie('token', accessToken, cookieOptions);
+        res.cookie('refreshToken', refreshToken, refreshCookieOptions);
 
         res.json({
             verified: true,

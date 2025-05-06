@@ -53,14 +53,22 @@ const Header = () => {
       });
 
       if (response.ok) {
+        // Clear any local storage items if you're using them
+        localStorage.clear();
         sessionStorage.clear();
+        
+        // Clear any auth state
         setIsAuthenticated(false);
-        navigate('/login');
+        
+        // Force reload after logout to clear any cached state
+        window.location.href = '/login';
       } else {
-        console.error('Logout failed');
+        console.error('Logout failed:', await response.text());
+        alert('Logout failed. Please try again.');
       }
     } catch (error) {
       console.error('Logout error:', error);
+      alert('Network error during logout. Please try again.');
     }
   };
 

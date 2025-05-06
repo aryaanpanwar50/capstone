@@ -29,14 +29,13 @@ authRouter.get('/google/callback',
         const user = await UserModel.findById(req.user._id).populate('friends');
         const { accessToken, refreshToken } = createTokens(user);
 
-        // Updated cookie settings
         const cookieOptions = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-            domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : 'localhost',
+            secure: true, // Always use secure in modern browsers
+            sameSite: 'none', // Required for cross-origin
             maxAge: 3600000, // 1 hour
-            path: '/'
+            path: '/',
+            domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
         };
 
         const refreshCookieOptions = {
@@ -47,7 +46,7 @@ authRouter.get('/google/callback',
         res.cookie('token', accessToken, cookieOptions);
         res.cookie('refreshToken', refreshToken, refreshCookieOptions);
 
-        const frontendURL = process.env.NODE_ENV === 'development' 
+        const frontendURL = process.env.NODE_ENV === 'production'
             ? 'https://capstone-two-gamma.vercel.app'
             : 'http://localhost:3000';
             
