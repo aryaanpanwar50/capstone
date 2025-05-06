@@ -26,31 +26,31 @@ authRouter.get('/google/callback',
         failureRedirect: 'https://capstone-two-gamma.vercel.app/login'
     }),
     async (req, res) => {
-        // Populate friends before generating token
         const user = await UserModel.findById(req.user._id).populate('friends');
-        
-        // Generate access and refresh tokens with complete user data
         const { accessToken, refreshToken } = createTokens(user);
 
-        // Set tokens in cookies
-        res.cookie('token', accessToken, {
+        // Updated cookie settings
+        const cookieOptions = {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 3600000 // 1 hour
-        });
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : 'localhost',
+            maxAge: 3600000, // 1 hour
+            path: '/'
+        };
 
-        res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+        const refreshCookieOptions = {
+            ...cookieOptions,
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-        });
+        };
 
-        // Use production URL directly
-        const frontendURL = 'https://capstone-two-gamma.vercel.app';
+        res.cookie('token', accessToken, cookieOptions);
+        res.cookie('refreshToken', refreshToken, refreshCookieOptions);
+
+        const frontendURL = process.env.NODE_ENV === 'development' 
+            ? 'https://capstone-two-gamma.vercel.app'
+            : 'http://localhost:3000';
             
-        // Redirect to the correct callback route
         res.redirect(`${frontendURL}/auth/callback?token=${accessToken}`);
     }
 );
