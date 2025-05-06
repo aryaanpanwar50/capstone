@@ -111,26 +111,7 @@ const NewReleases = () => {
             <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-8 bg-blue-500 rounded group-hover:h-12 transition-all duration-300"></span>
             New Releases
           </h2>
-          <a
-            href="#"
-            className="text-blue-500 hover:text-blue-600 font-semibold text-sm flex items-center gap-2 group transition-all duration-300"
-          >
-            View All
-            <svg
-              className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M9 5l7 7-7 7"
-              ></path>
-            </svg>
-          </a>
+          
         </div>
 
         <div className="relative group">

@@ -1,9 +1,10 @@
-const express = require("express");
-const faceAuthRouter = express.Router();
-const { signup, login, verifyFace } = require("../controller/faceAuth.controller");
+const express = require('express');
+const router = express.Router();
+const { signup, login, verifyFace, verifyAuth } = require('../controller/faceAuth.controller');
 
-faceAuthRouter.post("/face/signup", signup);
-faceAuthRouter.post("/face/login", login);
-faceAuthRouter.post("/face/verify", verifyFace);
+router.post('/face/signup', signup);
+router.post('/face/login', login);
+router.post('/face/verify', verifyFace);
+router.get('/verify-auth', verifyAuth);
 
-module.exports = { faceAuth: faceAuthRouter };
+module.exports = router;

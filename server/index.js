@@ -10,6 +10,7 @@ const { userRouter, authRouter } = require('./routes/user.routes');
 const { gameRouter } = require('./routes/game.routes');
 const { friendRequestRouter } = require('./routes/friendRequest.routes');
 const { faceAuth } = require('./routes/faceAuth.routes');
+const faceAuthRoutes = require('./routes/faceAuth.routes');
 const PORT = process.env.PORT || 8080;
 
 const app = express();
@@ -52,7 +53,7 @@ app.use('/auth', authRouter);
 app.use('/user', userRouter);
 app.use('/games', gameRouter);
 app.use('/friends', friendRequestRouter);
-app.use('/api', faceAuth);
+app.use('/faceAuth', faceAuthRoutes);
 
 // Start server
 const startServer = async () => {

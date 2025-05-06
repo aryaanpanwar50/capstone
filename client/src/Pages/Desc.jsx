@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Header from '../components/Header';
-import { Clock, Users, Star, Award, Share2, Heart, Eye } from 'lucide-react';
+import { Clock, Users, Star, Award, Share2, Heart, Eye, Maximize, Minimize } from 'lucide-react';
 
 const Desc = () => {
   const { id } = useParams();
@@ -10,6 +10,24 @@ const Desc = () => {
   const [error, setError] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [relatedGames, setRelatedGames] = useState([]);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+  };
+
+  const gameFrameStyle = isFullscreen ? {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    zIndex: 50,
+    border: 'none',
+  } : {
+    minHeight: 700,
+    border: 'none',
+  };
 
   useEffect(() => {
     const fetchGame = async () => {
@@ -42,6 +60,17 @@ const Desc = () => {
     // Reset scroll position when game ID changes
     window.scrollTo(0, 0);
   }, [id]);
+
+  useEffect(() => {
+    const handleEscKey = (event) => {
+      if (event.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleEscKey);
+    return () => window.removeEventListener('keydown', handleEscKey);
+  }, [isFullscreen]);
 
   const handleLike = () => {
     setIsLiked(!isLiked);
@@ -96,28 +125,12 @@ const Desc = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-950 to-indigo-950 text-gray-100">
-      <Header />
+      {!isFullscreen && <Header />}
       
       {game && (
         <div className="max-w-7xl mx-auto px-4 pt-8 pb-16">
-          {/* Game header with image */}
-          <div className="flex flex-col lg:flex-row gap-8 mb-8">
-            <div className="lg:w-1/2">
-              <div className="rounded-xl overflow-hidden bg-gradient-to-br from-indigo-600/20 to-purple-600/20 border border-white/10 shadow-xl">
-                {game.imageUrl ? (
-                  <img 
-                    src={game.imageUrl} 
-                    alt={game.title} 
-                    className="w-full aspect-video object-cover"
-                  />
-                ) : (
-                  <div className="w-full aspect-video bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center">
-                    <span className="text-3xl font-bold">{game.title?.charAt(0)}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-            
+          
+          <div className="flex flex-col lg:flex-row gap-8 mb-8">            
             <div className="lg:w-1/2">
               <div className="flex items-center gap-3 mb-2">
                 <span className="bg-indigo-600 text-white px-3 py-1 rounded-full text-sm font-medium">
@@ -174,12 +187,19 @@ const Desc = () => {
           </div>
           {/* Embed/play the game directly if game.url exists */}
           {game.url && (
-            <div className="w-full mb-10 rounded-xl overflow-hidden border border-white/10 shadow-xl bg-black">
+            <div className={`relative w-full mb-10 rounded-xl overflow-hidden border border-white/10 shadow-xl bg-black ${isFullscreen ? 'fixed inset-0 z-40' : ''}`}>
+              <button
+                onClick={toggleFullscreen}
+                className="absolute top-4 right-4 p-2 bg-black/50 rounded-lg hover:bg-black/70 transition-colors z-50 text-white"
+                title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+              >
+                {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
+              </button>
               <iframe
                 src={game.url}
                 title={game.title}
                 className="w-full"
-                style={{ minHeight: 500, border: 'none' }}
+                style={gameFrameStyle}
                 allow="autoplay; fullscreen"
               />
             </div>

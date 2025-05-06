@@ -1,34 +1,46 @@
-import { useState, useEffect } from 'react'
-import { Search, Menu, X, Gamepad2, Trophy, Star, Sparkles } from 'lucide-react'
-import { FaGamepad } from 'react-icons/fa'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react';
+import { Search, Menu, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { FaGamepad } from 'react-icons/fa';
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const navigate = useNavigate()
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:8080/user/check', {
-          method: 'GET',
-          credentials: 'include', // This ensures cookies are sent
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
+        const [regularAuthResponse, faceAuthResponse] = await Promise.allSettled([
+          fetch('http://localhost:8080/user/check', {
+            credentials: 'include'
+          }),
+          fetch('http://localhost:8080/faceAuth/verify-auth', {
+            credentials: 'include'
+          })
+        ]);
+
+        const isAuthenticated = (
+          regularAuthResponse.status === 'fulfilled' && regularAuthResponse.value.ok
+        ) || (
+          faceAuthResponse.status === 'fulfilled' && faceAuthResponse.value.ok
+        );
+
+        setIsAuthenticated(isAuthenticated);
         
-        setIsAuthenticated(response.ok);
+        if (!isAuthenticated) {
+          navigate('/login');
+        }
       } catch (error) {
         console.error('Auth check error:', error);
         setIsAuthenticated(false);
+        navigate('/login');
       }
     };
 
     checkAuth();
-  }, []);
+  }, [navigate]);
 
   const handleLogout = async () => {
     try {
@@ -41,13 +53,8 @@ const Header = () => {
       });
 
       if (response.ok) {
-        // Only clear session storage
         sessionStorage.clear();
-        
-        // Update authentication state
         setIsAuthenticated(false);
-        
-        // Navigate to login
         navigate('/login');
       } else {
         console.error('Logout failed');
@@ -64,8 +71,8 @@ const Header = () => {
       case "Top Charts": return "/top-charts";
       default: return "#";
     }
-  }
-  
+  };
+
   return (
     <motion.header 
       initial={{ y: -100 }}
@@ -79,115 +86,78 @@ const Header = () => {
             className="flex items-center gap-3"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => navigate(isAuthenticated ? '/home' : '/login')}
+            onClick={() => navigate('/home')}
             style={{ cursor: 'pointer' }}
           >
             <div className="w-10 h-10 bg-[#06c1ff] rounded-lg flex items-center justify-center text-[#0b2d72] font-bold text-2xl">
               <FaGamepad className="w-6 h-6" />
             </div>
-            <div className="text-2xl font-bold">Khelzy</div>
+            <div className="text-2xl font-bold text-white">Khelzy</div>
           </motion.div>
-          
-          {isAuthenticated && (
-            <div className="hidden md:flex gap-6">
-              {["Home", "Games", "Categories", "Top Charts", "New"].map((item, index) => (
-                <motion.a
-                  key={item}
-                  onClick={() => navigate(getNavPath(item))}
-                  className="text-white font-medium text-sm uppercase tracking-wider hover:text-[#06c1ff] transition-colors flex items-center gap-1 cursor-pointer"
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  {item === "Home" && <Gamepad2 className="w-4 h-4" />}
-                  {item === "Games" && <FaGamepad className="w-4 h-4" />}
-                  {item === "Categories" && <Sparkles className="w-4 h-4" />}
-                  {item === "Top Charts" && <Trophy className="w-4 h-4" />}
-                  {item === "New" && <Star className="w-4 h-4" />}
-                  {item}
-                </motion.a>
-              ))}
-            </div>
-          )}
 
-          <div className="flex items-center gap-4">
-            {isAuthenticated ? (
-              <>
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <Search className="w-5 h-5 text-white cursor-pointer hover:text-[#06c1ff] transition-colors" />
-                </motion.div>
-                <motion.button 
-                  className="px-6 py-2.5 rounded-full font-semibold cursor-pointer transition-all duration-300 text-sm uppercase tracking-wider bg-[#06c1ff] text-[#0b2d72] hover:translate-y-[-2px] hover:shadow-lg hover:shadow-[#06c1ff]/40"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleLogout}
-                >
-                  Logout
-                </motion.button>
-              </>
-            ) : null}
-            <motion.button 
-              className="md:hidden text-white hover:text-[#06c1ff] transition-colors"
+          {/* Navigation buttons */}
+          <div className="flex space-x-2">
+            <button 
+              className="bg-[#06c1ff] p-3 rounded-xl shadow-md hover:bg-[#05a1d6] transition-colors"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
             >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </motion.button>
+              <div className="text-[#0b2d72]">
+                {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </div>
+            </button>
+            
+            <button className="bg-[#06c1ff] p-3 rounded-xl shadow-md hover:bg-[#05a1d6] transition-colors">
+              <div className="text-[#0b2d72]">
+                <Search size={20} />
+              </div>
+            </button>
           </div>
         </nav>
-        
-        <AnimatePresence>
-          {isMenuOpen && (
-            <motion.div 
-              className="md:hidden mt-4 py-4 border-t border-white/10 flex flex-col gap-4"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              {isAuthenticated ? (
-                <>
-                  {["Home", "Games", "Categories", "Top Charts", "New"].map((item, index) => (
-                    <motion.a
-                      key={item}
-                      onClick={() => {
-                        navigate(getNavPath(item));
-                        setIsMenuOpen(false);
-                      }}
-                      className="text-white font-medium text-sm uppercase tracking-wider flex items-center gap-2 cursor-pointer"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      whileHover={{ x: 10 }}
-                    >
-                      {item === "Home" && <Gamepad2 className="w-4 h-4" />}
-                      {item === "Games" && <FaGamepad className="w-4 h-4" />}
-                      {item === "Categories" && <Sparkles className="w-4 h-4" />}
-                      {item === "Top Charts" && <Trophy className="w-4 h-4" />}
-                      {item === "New" && <Star className="w-4 h-4" />}
-                      {item}
-                    </motion.a>
-                  ))}
-                  <motion.button 
-                    className="mt-2 w-full px-6 py-2.5 rounded-full font-semibold cursor-pointer transition-all duration-300 text-sm uppercase tracking-wider bg-[#06c1ff] text-[#0b2d72] hover:translate-y-[-2px] hover:shadow-lg hover:shadow-[#06c1ff]/40"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </motion.button>
-                </>
-              ) : null}
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
-    </motion.header>
-  )
-}
 
-export default Header
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div 
+            className="absolute right-4 mt-2 bg-white rounded-xl shadow-lg z-50 w-48 overflow-hidden"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="p-2">
+              {["Home", "Games", "Categories", "Top Charts", "New"].map((item, index) => (
+                <motion.div
+                  key={item}
+                  onClick={() => {
+                    navigate(getNavPath(item));
+                    setIsMenuOpen(false);
+                  }}
+                  className="px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-lg cursor-pointer text-sm font-medium"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  {item}
+                </motion.div>
+              ))}
+              
+              {isAuthenticated && (
+                <motion.div
+                  onClick={handleLogout}
+                  className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg cursor-pointer text-sm font-medium text-center"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Logout
+                </motion.div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
+  );
+};
+
+export default Header;

@@ -9,7 +9,7 @@ const gameSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    instructions: {
+    instructions: { 
         type: String,
         required: true
     },
@@ -22,11 +22,7 @@ const gameSchema = mongoose.Schema({
         required: true
     },
     tags: {
-        type: String,
-        required: true
-    },
-    thumb: {
-        type: String,
+        type: [String],  // Changed to array of strings
         required: true
     },
     width: {
@@ -39,6 +35,17 @@ const gameSchema = mongoose.Schema({
     },
     count: {
         type: Number,
+        default: 0
+    },
+    developer: {
+        type: String,
+        required: true
+    },
+    rating: {
+        type: Number,
+        required: true,
+        min: 0,
+        max: 5,
         default: 0
     }
 }, {

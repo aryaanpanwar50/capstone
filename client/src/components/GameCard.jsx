@@ -1,23 +1,20 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const GameCard = ({ game, isNewRelease = false }) => {
   const [localCount, setLocalCount] = useState(game.count || 0);
+  const navigate = useNavigate();
 
-  const updateCount = async (_id) => {
+  const handleCardClick = async (e) => {
+    e.preventDefault();
+    if (!game._id) return;
+
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.error('No authentication token found');
-        return;
-      }
-
-      const response = await fetch(`http://localhost:8080/games/${_id}/count`, {
+      const response = await fetch(`http://localhost:8080/games/${game._id}/count`, {
         method: 'PATCH',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+           'Content-Type': 'application/json'
         },
         credentials: 'include'
       });
@@ -25,22 +22,13 @@ const GameCard = ({ game, isNewRelease = false }) => {
       if (response.ok) {
         const data = await response.json();
         setLocalCount(data.count);
-      } else if (response.status === 401) {
-        console.error('Authentication token expired or invalid');
       }
+      // Navigate to game details page
+      navigate(`/games/${game._id}`);
     } catch (error) {
       console.error('Error updating game count:', error);
-    }
-  };
-
-  const handlePlayClick = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    if (game._id) {
-      updateCount(game._id);
-    }
-    if (game.url) {
-      window.open(game.url, '_blank');
+      // Still navigate even if count update fails
+      navigate(`/games/${game._id}`);
     }
   };
 
@@ -48,7 +36,7 @@ const GameCard = ({ game, isNewRelease = false }) => {
 
   if (isNewRelease) {
     return (
-      <Link to={`/games/${game._id}`} className="block">
+      <div onClick={handleCardClick} className="block cursor-pointer">
         <div className="min-w-[110px] max-w-[180px] flex-shrink-0 bg-gray-900 rounded-2xl overflow-hidden">
           <div className="relative h-[180px] overflow-hidden">
             {isVideo ? (
@@ -75,12 +63,12 @@ const GameCard = ({ game, isNewRelease = false }) => {
             </h3>
           </div>
         </div>
-      </Link>
+      </div>
     );
   }
 
   return (
-    <Link to={`/games/${game._id}`} className="block">
+    <div onClick={handleCardClick} className="block cursor-pointer">
       <div className="bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-lg rounded-2xl overflow-hidden border border-white/10">
         <div className="relative h-48 overflow-hidden">
           {isVideo ? (
@@ -105,7 +93,7 @@ const GameCard = ({ game, isNewRelease = false }) => {
           <h3 className="text-lg font-bold mb-3 text-white truncate">{game.title}</h3>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

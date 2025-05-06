@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import CategorieGames from '../components/CategorieGames2';
+import CategorieGames from '../components/CategorieGames';
 import Header from '../components/Header';
 
 const Categories = ({ onCategoryClick, selectedCategory }) => {

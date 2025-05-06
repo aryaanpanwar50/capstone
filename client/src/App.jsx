@@ -31,53 +31,42 @@ const AuthCallback = () => {
 // ProtectedRoute component to check authentication
 const ProtectedRoute = ({ children }) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [isVerifying, setIsVerifying] = useState(true);
 
   useEffect(() => {
     const verifyAuth = async () => {
       try {
-        // Try to verify authentication using cookies
-        const response = await fetch('http://localhost:8080/user/check', {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
+        // Try both regular auth and face auth
+        const [regularAuthResponse, faceAuthResponse] = await Promise.allSettled([
+          fetch('http://localhost:8080/user/check', {
+            credentials: 'include'
+          }),
+          fetch('http://localhost:8080/faceAuth/verify-auth', {
+            credentials: 'include'
+          })
+        ]);
 
-        if (!response.ok) {
-          // If verification fails, try to refresh the token
-          try {
-            const refreshResponse = await fetch('http://localhost:8080/user/refresh-token', {
-              method: 'POST',
-              credentials: 'include'
-            });
-            
-            if (refreshResponse.ok) {
-              setIsVerifying(false);
-              return;
-            }
-          } catch (refreshError) {
-            console.error('Token refresh error:', refreshError);
-          }
+        // Check if either authentication method is valid
+        const isAuthenticated = (
+          regularAuthResponse.status === 'fulfilled' && regularAuthResponse.value.ok
+        ) || (
+          faceAuthResponse.status === 'fulfilled' && faceAuthResponse.value.ok
+        );
 
-          // If both verification and refresh fail, redirect to login
-          sessionStorage.setItem('redirectPath', location.pathname);
+        if (!isAuthenticated) {
           navigate('/login', { replace: true });
           return;
         }
 
         setIsVerifying(false);
       } catch (error) {
-        console.error('Authentication verification error:', error);
-        sessionStorage.setItem('redirectPath', location.pathname);
+        console.error('Auth verification error:', error);
         navigate('/login', { replace: true });
       }
     };
 
     verifyAuth();
-  }, [navigate, location]);
+  }, [navigate]);
 
   if (isVerifying) {
     return <div>Verifying authentication...</div>;
@@ -93,26 +82,40 @@ ProtectedRoute.propTypes = {
 // AuthRoute component to prevent authenticated users from accessing login/auth pages
 const AuthRoute = ({ children }) => {
   const navigate = useNavigate();
+  const [isVerifying, setIsVerifying] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:8080/user/check', {
-          method: 'GET',
-          credentials: 'include'
-        });
-        
-        if (response.ok) {
-          // If user is already logged in, redirect to home
+        const [regularAuthResponse, faceAuthResponse] = await Promise.allSettled([
+          fetch('http://localhost:8080/user/check', {
+            credentials: 'include'
+          }),
+          fetch('http://localhost:8080/faceAuth/verify-auth', {
+            credentials: 'include'
+          })
+        ]);
+
+        // If either auth is valid, redirect to home
+        if ((regularAuthResponse.status === 'fulfilled' && regularAuthResponse.value.ok) ||
+            (faceAuthResponse.status === 'fulfilled' && faceAuthResponse.value.ok)) {
           navigate('/home', { replace: true });
+          return;
         }
+        
+        setIsVerifying(false);
       } catch (error) {
         console.error('Auth check error:', error);
+        setIsVerifying(false);
       }
     };
 
     checkAuth();
   }, [navigate]);
+
+  if (isVerifying) {
+    return <div>Checking authentication...</div>;
+  }
 
   return children;
 };

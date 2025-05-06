@@ -14,6 +14,7 @@ const FaceAuth = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        checkExistingToken();
         loadModels();
         return () => {
             if (videoRef.current?.srcObject) {
@@ -21,6 +22,19 @@ const FaceAuth = () => {
             }
         };
     }, []);
+
+    const checkExistingToken = async () => {
+        try {
+            const response = await axios.get("http://localhost:8080/faceAuth/verify-auth", {
+                withCredentials: true
+            });
+            if (response.data.success) {
+                navigate("/home");
+            }
+        } catch (error) {
+            console.log("No valid session found");
+        }
+    };
 
     const loadModels = async () => {
         try {
@@ -74,7 +88,7 @@ const FaceAuth = () => {
         if (!faceEmbedding) return alert("Face not detected!");
 
         try {
-            const res = await axios.post("http://localhost:8080/api/face/signup", { email, faceEmbedding });
+            const res = await axios.post("http://localhost:8080/faceAuth/face/signup", { email, faceEmbedding });
             stopCamera();
             alert(res.data.message);
         } catch (err) {
@@ -96,11 +110,11 @@ const FaceAuth = () => {
                 return;
             }
 
-            const loginResponse = await axios.post("http://localhost:8080/api/face/login", {
+            const loginResponse = await axios.post("http://localhost:8080/faceAuth/face/login", {
                 email,
                 faceEmbedding
             }, {
-                withCredentials: true // This ensures cookies are sent and received
+                withCredentials: true
             });
 
             const { verified, similarity, message, threshold } = loginResponse.data;
@@ -115,9 +129,18 @@ const FaceAuth = () => {
 
             if (verified) {
                 stopCamera();
-                setTimeout(() => {
-                    navigate("/home");
-                }, 1500);
+                // Check if token is properly set after login
+                const authCheck = await axios.get("http://localhost:8080/faceAuth/verify-auth", {
+                    withCredentials: true
+                });
+                
+                if (authCheck.data.success) {
+                    setTimeout(() => {
+                        navigate("/home");
+                    }, 1500);
+                } else {
+                    throw new Error("Authentication failed");
+                }
             }
         } catch (err) {
             const errorMessage = err.response?.data?.message || "Face verification failed";

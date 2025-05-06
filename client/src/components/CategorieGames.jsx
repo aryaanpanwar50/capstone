@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import GameCard from './GameCard';
 
 const CategorieGames = ({ selectedCategory }) => {
@@ -7,8 +6,7 @@ const CategorieGames = ({ selectedCategory }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filteredGames, setFilteredGames] = useState([]);
-  const [visibleGames, setVisibleGames] = useState(15); // Show 3 rows initially
-  const navigate = useNavigate();
+  const [visibleGames, setVisibleGames] = useState(15);
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -55,11 +53,7 @@ const CategorieGames = ({ selectedCategory }) => {
   }, [games, selectedCategory]);
 
   const showMoreGames = () => {
-    navigate('/categories');
-    // Add a small delay before reloading to ensure navigation completes
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
+    setVisibleGames(prev => prev + 15); // Show 15 more games
   };
 
   if (loading) {
@@ -87,18 +81,14 @@ const CategorieGames = ({ selectedCategory }) => {
     );
   }
 
-
-
   return (
-    <section className="py-16 bg-gradient-to-b from-blue-900/5 to-blue-800/10">
+    <section className="py-16 bg-gradient-to-b from-blue-900/5 to-blue-800/10 group">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Games Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {filteredGames.length > 0 ? (
             filteredGames.slice(0, visibleGames).map((game, index) => (
-              <div key={index}>
-                <GameCard game={game} isNewRelease={true} />
-              </div>
+              <GameCard key={index} game={game} isNewRelease={true} />
             ))
           ) : (
             <div className="col-span-full py-16 text-center text-gray-400">
@@ -112,10 +102,10 @@ const CategorieGames = ({ selectedCategory }) => {
         
         {/* See More Button */}
         {filteredGames.length > visibleGames && (
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center mt-8">
             <button
               onClick={showMoreGames}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
             >
               See More
             </button>
