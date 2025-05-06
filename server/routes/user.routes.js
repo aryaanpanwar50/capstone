@@ -22,7 +22,9 @@ userRouter.get('/check', verifyToken, checkAuth);
 authRouter.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 authRouter.get('/google/callback', 
-    passport.authenticate('google', { failureRedirect: 'http://localhost:5173/login' }),
+    passport.authenticate('google', { 
+        failureRedirect: 'https://capstone-two-gamma.vercel.app/login'
+    }),
     async (req, res) => {
         // Populate friends before generating token
         const user = await UserModel.findById(req.user._id).populate('friends');
@@ -45,13 +47,11 @@ authRouter.get('/google/callback',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
-        // Use environment variable for frontend URL
-        const frontendURL = process.env.NODE_ENV === 'production' 
-            ? 'https://capstone-two-gamma.vercel.app'
-            : 'http://localhost:5173';
+        // Use production URL directly
+        const frontendURL = 'https://capstone-two-gamma.vercel.app';
             
-        // Redirect to frontend with token in URL for localStorage
-        res.redirect(`${frontendURL}/login/auth/callback?token=${accessToken}`);
+        // Redirect to the correct callback route
+        res.redirect(`${frontendURL}/auth/callback?token=${accessToken}`);
     }
 );
 
