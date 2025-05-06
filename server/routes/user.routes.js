@@ -46,9 +46,7 @@ authRouter.get('/google/callback',
         res.cookie('token', accessToken, cookieOptions);
         res.cookie('refreshToken', refreshToken, refreshCookieOptions);
 
-        const frontendURL = process.env.NODE_ENV === 'production'
-            ? 'https://capstone-two-gamma.vercel.app'
-            : 'http://localhost:3000';
+        const frontendURL = 'https://capstone-two-gamma.vercel.app';
             
         res.redirect(`${frontendURL}/auth/callback?token=${accessToken}`);
     }
