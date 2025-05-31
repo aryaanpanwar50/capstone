@@ -23,7 +23,6 @@ const AuthCallback = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const token = params.get('token');
-    console.log(token)
     if (token) {
       navigate('/home');
     } else {
@@ -61,7 +60,6 @@ const ProtectedRoute = ({ children }) => {
         navigate('/login', { replace: true });
         return;
       }
-      console.log(isAuthenticated)
 
       
         const elapsedTime = Date.now() - startTime
@@ -119,9 +117,10 @@ const AuthRoute = ({ children }) => {
         navigate('/home', { replace: true });
         return;
       }
+      console.log(isAuthenticated)
       setIsVerifying(false);
       }catch(error){
-        console.log({error:error.message})
+        console.error(error.message)
       }
       
     };
@@ -130,7 +129,7 @@ const AuthRoute = ({ children }) => {
   }, [navigate]);
 
   if (isVerifying) {
-    return <div>Checking authentication...7000</div>;
+    return <div>Checking authentication...</div>;
   }
 
   return children;
@@ -158,9 +157,9 @@ function App() {
           } />
 
           <Route path="/home" element={
-            
+            <ProtectedRoute>
               <Home />
-            
+            </ProtectedRoute>
           } />
           <Route path='/top-charts' element={
             <ProtectedRoute>
