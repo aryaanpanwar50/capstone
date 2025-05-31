@@ -60,6 +60,7 @@ const ProtectedRoute = ({ children }) => {
         navigate('/login', { replace: true });
         return;
       }
+      console.log(isAuthenticated)
 
       
         const elapsedTime = Date.now() - startTime
@@ -128,7 +129,7 @@ const AuthRoute = ({ children }) => {
   }, [navigate]);
 
   if (isVerifying) {
-    return <div>Checking authentication...</div>;
+    return <div>Checking authentication...7000</div>;
   }
 
   return children;
