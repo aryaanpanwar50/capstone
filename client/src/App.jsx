@@ -37,7 +37,8 @@ const verifyAuth = async () => {
   try {
     const [regularAuthResponse, faceAuthResponse] = await Promise.all([
       fetch(`${API_URL}/user/check`, fetchOptions),
-      fetch(`${API_URL}/faceAuth/verify-auth`, fetchOptions)
+      fetch(`${API_URL}/faceAuth/verify-auth`, fetchOptions),
+      console.log(regularAuthResponse.ok || faceAuthResponse.ok)
     ]);
 
     return regularAuthResponse.ok || faceAuthResponse.ok;
