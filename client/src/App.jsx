@@ -40,7 +40,7 @@ const verifyAuth = async () => {
       fetch(`${API_URL}/faceAuth/verify-auth`, fetchOptions),
       
     ]);
-    console.log(regularAuthResponse.error, faceAuthResponse)
+    console.log(regularAuthResponse, faceAuthResponse)
     return regularAuthResponse.ok || faceAuthResponse.ok;
   } catch (error) {
     console.error('Auth verification failed:', {
