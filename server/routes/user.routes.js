@@ -35,7 +35,7 @@ authRouter.get('/google/callback',
             sameSite: 'none', // Required for cross-origin
             maxAge: 3600000, // 1 hour
             path: '/',
-            domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
+            domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined
         };
 
         const refreshCookieOptions = {
