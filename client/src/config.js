@@ -5,7 +5,7 @@ export const fetchOptions = {
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-    // 'Origin': 'https://capstone-ochre-kappa.vercel.app'
+    'Origin': 'https://capstone-ochre-kappa.vercel.app'
   },
   mode: 'cors'
 };
