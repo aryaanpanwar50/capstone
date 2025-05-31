@@ -5,11 +5,15 @@ import './App.css'
 import Login from './Pages/Login'
 import Home from './Pages/Home'
 import FaceAuth from './Pages/FaceAuth'
-import FingerAuth from './Pages/FingerAuth'
-import GamesCategoriesPage from './Pages/GamesCategoriesPage';
+import LandingPage from './Pages/LandingPage';
+import { ThemeProvider } from './context/ThemeContext';
 import TopChart from './Pages/TopChart';
 import Desc from './Pages/Desc';
+import AllGames from './Pages/AllGames';
 import { API_URL, fetchOptions } from './config';
+import GameByTag from './components/GameByTag';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react'
+
 
 // Handle auth callback
 const AuthCallback = () => {
@@ -50,27 +54,55 @@ const ProtectedRoute = ({ children }) => {
 
   useEffect(() => {
     const verify = async () => {
+      const startTime = Date.now()
       const isAuthenticated = await verifyAuth();
       if (!isAuthenticated) {
         navigate('/login', { replace: true });
         return;
       }
-      setIsVerifying(false);
+
+      
+        const elapsedTime = Date.now() - startTime
+        const remainingDelay = Math.max(0, 2000 - elapsedTime)
+        
+        setTimeout(() => {
+          setIsVerifying(false)
+        }, remainingDelay)
+
+        
     };
 
     verify();
   }, [navigate]);
 
   if (isVerifying) {
-    return <div>Verifying authentication...</div>;
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh'
+      }}>
+        <DotLottieReact
+          src="https://lottie.host/376c2d63-c220-4987-b922-67d602ba3510/DCVf0jB4V9.lottie"
+          loop
+          autoplay
+          style={{
+            width: '200px',  // Adjust size as needed
+            height: '200px'  // Adjust size as needed
+          }}
+        />
+        <div style={{ marginTop: '20px', fontSize: '1.2rem' }}>
+          Verifying authentication...
+        </div>
+      </div>
+    );
   }
 
   return children;
 };
 
-ProtectedRoute.propTypes = {
-  children: PropTypes.node.isRequired,
-};
 
 // AuthRoute component to prevent authenticated users from accessing login/auth pages
 const AuthRoute = ({ children }) => {
@@ -103,43 +135,39 @@ AuthRoute.propTypes = {
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={
-          <AuthRoute>
-            <Login />
-          </AuthRoute>
-        } />
-        <Route path="/face-auth" element={
-          <AuthRoute>
-            <FaceAuth />
-          </AuthRoute>
-        } />
-        <Route path="/finger-auth" element={
-          <AuthRoute>
-            <FingerAuth />
-          </AuthRoute>
-        } />
-        <Route path="/home" element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        } />
-        <Route path='/categories' element={
-          <ProtectedRoute>
-            <GamesCategoriesPage />
-          </ProtectedRoute>
-        } />
-        <Route path='/top-charts' element={
-          <ProtectedRoute>
-            <TopChart />
-          </ProtectedRoute>
-        } />
-        <Route path="/auth/callback" element={<AuthCallback />} />
-        <Route path="/games/:id" element={<Desc />} />
-      </Routes>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Navigate to="/landing" replace />} />
+          <Route path="/login" element={
+            <AuthRoute>
+              <Login />
+            </AuthRoute>
+          } />
+          <Route path="/face-auth" element={
+            <AuthRoute>
+              <FaceAuth />
+            </AuthRoute>
+          } />
+
+          <Route path="/home" element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } />
+          <Route path='/top-charts' element={
+            <ProtectedRoute>
+              <TopChart />
+            </ProtectedRoute>
+          } />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/games/:id" element={<Desc />} />
+          <Route path='/landing' element={<LandingPage/>}/>
+          <Route path='/games/filter/:category' element={<GameByTag></GameByTag>}/>
+          <Route path='/games' element={<AllGames></AllGames>}/>
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 }
 

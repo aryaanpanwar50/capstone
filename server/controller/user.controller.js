@@ -3,10 +3,7 @@ const jwt = require('jsonwebtoken');
 const { UserModel } = require('../models/user.model');
 const { createTokens } = require('../MiddleWare/authMiddleware');
 
-// Function to generate a random 10-digit number
-const generateTenDigitId = () => {
-    return Math.floor(1000000000 + Math.random() * 9000000000).toString();
-};
+
 
 const register = async (req, res) => {
     try {
@@ -18,30 +15,18 @@ const register = async (req, res) => {
             return res.status(400).json({ msg: 'User already exists' });
         }
 
-        // Generate a unique 10-digit ID
-        let userId;
-        let isUnique = false;
-        while (!isUnique) {
-            userId = generateTenDigitId();
-            const existingId = await UserModel.findOne({ id: userId });
-            if (!existingId) {
-                isUnique = true;
-            }
-        }
-
         const hash = await bcrypt.hash(password, 12);
         const user = new UserModel({ 
             name, 
             email, 
             password: hash,
-            id: userId
+           
         });
         await user.save();
         
         res.status(201).json({ 
             success: true,
             msg: 'User registered successfully',
-            userId,
             user : user
         });
     } catch (error) {
@@ -153,7 +138,7 @@ const logout = async (req, res) => {
 const getCurrentUser = async (req, res) => {
     try {
         // Get userId from token
-        const userId = req.user.userId;
+        const userId = req.user._id;
         
         // Fetch the complete user data from database
         const user = await UserModel.findById(userId);
@@ -205,7 +190,7 @@ const refreshAccessToken = async (req, res) => {
             });
         }
 
-        const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET || 'refresh-secret');
+        const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
         const user = await UserModel.findById(decoded.userId);
 
         if (!user) {

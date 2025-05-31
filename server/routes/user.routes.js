@@ -3,7 +3,7 @@ const passport = require('passport');
 const { register, login, logout, getCurrentUser, checkAuth, refreshAccessToken } = require('../controller/user.controller');
 const { verifyToken, createTokens } = require('../MiddleWare/authMiddleware');
 const { UserModel } = require('../models/user.model');
-const jwt = require('jsonwebtoken');
+
 
 const userRouter = express.Router();
 const authRouter = express.Router();
@@ -23,7 +23,7 @@ authRouter.get('/google', passport.authenticate('google', { scope: ['profile', '
 
 authRouter.get('/google/callback', 
     passport.authenticate('google', { 
-        failureRedirect: 'https://capstone-two-gamma.vercel.app/login'
+        failureRedirect: 'http://localhost:8080'
     }),
     async (req, res) => {
         const user = await UserModel.findById(req.user._id).populate('friends');
@@ -46,7 +46,7 @@ authRouter.get('/google/callback',
         res.cookie('token', accessToken, cookieOptions);
         res.cookie('refreshToken', refreshToken, refreshCookieOptions);
 
-        const frontendURL = 'https://capstone-two-gamma.vercel.app';
+        const frontendURL = 'http://localhost:5173';
             
         res.redirect(`${frontendURL}/auth/callback?token=${accessToken}`);
     }

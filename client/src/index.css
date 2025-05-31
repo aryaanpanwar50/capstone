@@ -1,1 +1,42 @@
 @import "tailwindcss";
+
+/* Scrollbar Utilities */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Theme Transitions */
+.theme-transition {
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Mode Colors */
+:root {
+  --color-primary: rgb(79, 70, 229);
+  --color-primary-dark: rgb(67, 56, 202);
+  --color-secondary: rgb(99, 102, 241);
+  --color-accent: rgb(16, 185, 129);
+}
+
+/* Light Mode Default */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f3f4f6;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+}
+
+/* Dark Mode Override */
+:root[class~="dark"] {
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+}

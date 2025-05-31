@@ -13,7 +13,7 @@ const createTokens = (user) => {
     const accessToken = jwt.sign(
         tokenPayload,
         process.env.JWT_SECRET || 'secret',
-        { expiresIn: '1h' }
+        { expiresIn: '8h' }
     );
     
     const refreshToken = jwt.sign(

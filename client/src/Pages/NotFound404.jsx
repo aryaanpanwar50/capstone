@@ -22,7 +22,7 @@ export default function NotFound404() {
                 The page you are looking for is not available!
               </p>
               <a
-                href="/"
+                href="/home"
                 className="inline-block bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition"
               >
                 Go to Home

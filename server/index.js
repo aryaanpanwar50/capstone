@@ -8,8 +8,7 @@ const MongoStore  = require('connect-mongo');
 const { connectDB } = require('./config/db');
 const { userRouter, authRouter } = require('./routes/user.routes');
 const { gameRouter } = require('./routes/game.routes');
-const { friendRequestRouter } = require('./routes/friendRequest.routes');
-const { faceAuth } = require('./routes/faceAuth.routes');
+const commentRouter = require('./routes/comment.routes')
 const faceAuthRoutes = require('./routes/faceAuth.routes');
 const PORT = process.env.PORT || 8080;
 
@@ -20,11 +19,13 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Enable CORS with specific origins and configuration
+// Update the CORS configuration
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://capstone-two-gamma.vercel.app'],
+  origin: 'http://localhost:5173',
   credentials: true,
+  preflightContinue: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 app.enable('trust proxy'); // Add this line for secure cookies to work
@@ -53,7 +54,7 @@ app.use(passport.session());
 app.use('/auth', authRouter);
 app.use('/user', userRouter);
 app.use('/games', gameRouter);
-app.use('/friends', friendRequestRouter);
+app.use('/comments',commentRouter)
 app.use('/faceAuth', faceAuthRoutes);
 
 // Start server
