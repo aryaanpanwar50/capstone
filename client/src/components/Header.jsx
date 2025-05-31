@@ -14,19 +14,23 @@ const Header = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const [regularAuthResponse, faceAuthResponse] = await Promise.allSettled([
-          fetch(`${API_URL}/user/check`, fetchOptions),
-          fetch(`${API_URL}/faceAuth/verify-auth`, fetchOptions)
+        const responses = await Promise.allSettled([
+          fetch(`${API_URL}/user/check`, {
+            ...fetchOptions,
+            method: 'GET'
+          }),
+          fetch(`${API_URL}/faceAuth/verify-auth`, {
+            ...fetchOptions,
+            method: 'GET'
+          })
         ]);
 
-        const isAuthenticated = (
-          regularAuthResponse.status === 'fulfilled' && regularAuthResponse.value.ok
-        ) || (
-          faceAuthResponse.status === 'fulfilled' && faceAuthResponse.value.ok
+        const isAuthenticated = responses.some(response => 
+          response.status === 'fulfilled' && response.value.ok
         );
 
         setIsAuthenticated(isAuthenticated);
-        if (!isAuthenticated) {
+        if (!isAuthenticated && window.location.pathname !== '/login') {
           navigate('/login');
         }
       } catch (error) {

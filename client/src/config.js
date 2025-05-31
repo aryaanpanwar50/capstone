@@ -6,8 +6,7 @@ export const fetchOptions = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
     'Origin': 'https://capstone-ochre-kappa.vercel.app'
-  },
-  mode: 'cors'
+  }
 };
 
 export async function tryAPI(path, customOptions = {}) {

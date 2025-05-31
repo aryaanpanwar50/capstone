@@ -35,18 +35,25 @@ const AuthCallback = () => {
 
 const verifyAuth = async () => {
   try {
-    const [regularAuthResponse, faceAuthResponse] = await Promise.all([
-      fetch(`${API_URL}/user/check`, fetchOptions),
-      fetch(`${API_URL}/faceAuth/verify-auth`, fetchOptions),
-      
+    const responses = await Promise.allSettled([
+      fetch(`${API_URL}/user/check`, {
+        ...fetchOptions,
+        method: 'GET'
+      }),
+      fetch(`${API_URL}/faceAuth/verify-auth`, {
+        ...fetchOptions,
+        method: 'GET'
+      })
     ]);
-    console.log(regularAuthResponse, faceAuthResponse)
-    return regularAuthResponse.ok || faceAuthResponse.ok;
+
+    return responses.some(response => 
+      response.status === 'fulfilled' && response.value.ok
+    );
   } catch (error) {
     console.error('Auth verification failed:', {
-        message: error.message,
-        stack: error.stack,
-        location: 'verifyAuth function'
+      message: error.message,
+      stack: error.stack,
+      location: 'verifyAuth function'
     });
     return false;
   }
