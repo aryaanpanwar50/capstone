@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import GameCard from '../components/GameCard';
@@ -236,9 +237,11 @@ function Home() {
                   <Flame className={theme.accent} size={24} />
                   <h2 className={`text-xl font-bold ${theme.primary}`}>Popular Games</h2>
                 </div>
-                <button className={`text-sm font-medium ${theme.accent} hover:${theme.accentHover} transition-colors`}>
+                <Link to='/games'>
+                <button className={`text-sm font-medium ${theme.accent} hover:${theme.accentHover} transition-colors cursor-pointer`}>
                   View All
                 </button>
+                </Link>
               </div>
               <GameGrid />
             </section>

@@ -67,7 +67,7 @@ const login = async (req, res) => {
             sameSite: 'none',
             path: '/',
             domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined,
-            maxAge: 3600000 // 1 hour
+            maxAge: 28800000 // 8 hours
         };
 
         const refreshCookieOptions = {

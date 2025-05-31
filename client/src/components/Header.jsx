@@ -8,7 +8,6 @@ import ThemeToggle from './ThemeToggle';
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const navigate = useNavigate();
   const { theme } = useTheme();
 
@@ -40,6 +39,8 @@ const Header = () => {
     checkAuth();
   }, [navigate]);
 
+
+
   const handleLogout = async () => {
     try {
       const response = await fetch(`${API_URL}/user/logout`, {
@@ -66,7 +67,6 @@ const Header = () => {
     { name: "Home", path: "/home", icon: <Home size={20} /> },
     { name: "Games", path: "/games", icon: <Gamepad size={20} /> },
     { name: "Top Charts", path: "/top-charts", icon: <BarChart2 size={20} /> },
-    { name: "New", path: "/new", icon: <Sparkles size={20} /> }
   ];
 
   // Control body scroll when mobile menu is open
@@ -125,34 +125,6 @@ const Header = () => {
 
             {/* Right Section */}
             <div className="flex items-center gap-3">
-              {/* Search - Desktop */}
-              {isSearchOpen && (
-                <div className="hidden md:block relative">
-                  <input
-                    type="text"
-                    placeholder="Search games..."
-                    className={`w-64 px-4 py-2 rounded-lg ${theme.cardBg} ${theme.border} ${theme.primary} placeholder:${theme.muted} focus:outline-none focus:border-[#06c1ff] transition-all`}
-                    autoFocus
-                  />
-                  <button 
-                    className={`absolute right-2 top-1/2 transform -translate-y-1/2 ${theme.muted} hover:${theme.primary}`}
-                    onClick={() => setIsSearchOpen(false)}
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
-              )}
-
-              {/* Search Toggle - Desktop */}
-              {!isSearchOpen && (
-                <button
-                  onClick={() => setIsSearchOpen(true)}
-                  className={`hidden md:flex p-2 hover:bg-[#06c1ff]/5 rounded-lg ${theme.secondary} hover:${theme.primary} transition-colors`}
-                >
-                  <Search size={20} />
-                </button>
-              )}
-
               {/* Theme Toggle */}
               <div className="hidden md:block">
                 <ThemeToggle />
@@ -186,17 +158,6 @@ const Header = () => {
         }`}
       >
         <div className="flex flex-col h-full p-4">
-          {/* Mobile Search */}
-          <div className="mb-6">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search games..."
-                className={`w-full px-4 py-3 rounded-lg ${theme.cardBg} ${theme.border} ${theme.primary} placeholder:${theme.muted} focus:outline-none focus:border-[#06c1ff]`}
-              />
-              <Search className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${theme.muted}`} size={18} />
-            </div>
-          </div>
 
           {/* Mobile Navigation */}
           <nav className="flex-1 space-y-2">

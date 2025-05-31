@@ -2,9 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
-  FaGoogle,
-  FaFacebook,
-  FaTwitter
+  FaGoogle
 } from 'react-icons/fa';
 import { 
   Mail, 
@@ -213,7 +211,9 @@ const SlidingDoorLoginPage = () => {
                             type="email" 
                             value={loginData.email}
                             onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                            className="w-full pl-10 pr-4 py-3 bg-white/10 border border-[#06c1ff]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06c1ff]  placeholder-white/60 backdrop-blur-sm transition-all duration-300 hover:border-[#06c1ff]/50" 
+                            className={`w-full pl-10 pr-4 py-3 bg-white/10 border border-[#06c1ff]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06c1ff] backdrop-blur-sm transition-all duration-300 hover:border-[#06c1ff]/50 ${
+                              isDarkMode ? 'text-white placeholder-white/60' : 'text-gray-900 placeholder-gray-500'
+                            }`}
                             placeholder="Enter your email"
                           />
                         </div>
@@ -232,7 +232,9 @@ const SlidingDoorLoginPage = () => {
                             type="password" 
                             value={loginData.password}
                             onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                            className="w-full pl-10 pr-4 py-3 bg-white/10 border border-[#06c1ff]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06c1ff]  placeholder-white/60 backdrop-blur-sm transition-all duration-300 hover:border-[#06c1ff]/50" 
+                            className={`w-full pl-10 pr-4 py-3 bg-white/10 border border-[#06c1ff]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06c1ff] backdrop-blur-sm transition-all duration-300 hover:border-[#06c1ff]/50 ${
+                              isDarkMode ? 'text-white placeholder-white/60' : 'text-gray-900 placeholder-gray-500'
+                            }`}
                             placeholder="••••••••"
                           />
                         </div>
@@ -268,42 +270,26 @@ const SlidingDoorLoginPage = () => {
                         </div>
                       </div>
                       
-                      <div className="mt-6 grid grid-cols-3 gap-3">
+                      <div className="mt-6">
                         <button 
                           onClick={() => window.location.href = `${API_URL}/auth/google`}
                           className="w-full inline-flex justify-center py-2 px-4 border border-white/20 rounded-lg shadow-sm bg-white/5 hover:bg-white/15 hover:border-white/30 hover:shadow-md transition-all duration-300"
                         >
                           <FaGoogle className={`h-5 w-5 ${isDarkMode ? 'text-white' : 'text-gray-800'}`} />
                         </button>
-                        <button className="w-full inline-flex justify-center py-2 px-4 border border-white/20 rounded-lg shadow-sm bg-white/5 hover:bg-white/15 hover:border-white/30 hover:shadow-md transition-all duration-300">
-                          <FaFacebook className={`h-5 w-5 ${isDarkMode ? 'text-white' : 'text-gray-800'}`} />
-                        </button>
-                        <button className="w-full inline-flex justify-center py-2 px-4 border border-white/20 rounded-lg shadow-sm bg-white/5 hover:bg-white/15 hover:border-white/30 hover:shadow-md transition-all duration-300">
-                          <FaTwitter className={`h-5 w-5 ${isDarkMode ? 'text-white' : 'text-gray-800'}`} />
-                        </button>
                       </div>
-                      
-                      {/* Improved biometric authentication buttons */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+
+                      {/* Biometric authentication button */}
+                      <div className="mt-4">
                         <button 
                           onClick={() => navigate('/face-auth')}
-                          className={`inline-flex justify-center items-center py-3 px-4 border border-[#06c1ff]/40 rounded-lg bg-white/5 hover:bg-white/15 hover:border-[#06c1ff]/60 transition-all duration-300 ${isDarkMode ? 'text-white' : 'text-gray-800'} hover:shadow-md`}
+                          className={`w-full inline-flex justify-center items-center py-3 px-4 border border-[#06c1ff]/40 rounded-lg bg-white/5 hover:bg-white/15 hover:border-[#06c1ff]/60 transition-all duration-300 ${isDarkMode ? 'text-white' : 'text-gray-800'} hover:shadow-md`}
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-2 ${isDarkMode ? 'text-[#06c1ff]' : 'text-gray-600'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <circle cx="12" cy="8" r="4"/>
                             <path d="M12 14c-4.42 0-8 1.79-8 4v2h16v-2c0-2.21-3.58-4-8-4z"/>
                           </svg>
                           <span>Face ID</span>
-                        </button>
-
-                        <button 
-                          onClick={() => navigate('/finger-auth')}
-                          className={`inline-flex justify-center items-center py-3 px-4 border border-[#06c1ff]/40 rounded-lg bg-white/5 hover:bg-white/15 hover:border-[#06c1ff]/60 transition-all duration-300 ${isDarkMode ? 'text-white' : 'text-gray-800'} hover:shadow-md`}
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-2 ${isDarkMode ? 'text-[#06c1ff]' : 'text-gray-600'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M12 11c1.66 0 3-1.34 3-3S13.66 5 12 5s-3 1.34-3 3 1.34 3 3 3zm0 1c-1.84 0-3.56.5-5.03 1.37-.61.36-.97 1.02-.97 1.72V16h12v-.91c0-.7-.36-1.36-.97-1.72C15.56 12.5 13.84 12 12 12zm0-8c3.31 0 6 2.69 6 6 0 1.54-.58 2.94-1.53 4H7.53C6.58 12.94 6 11.54 6 10c0-3.31 2.69-6 6-6z"/>
-                          </svg>
-                          <span>Fingerprint</span>
                         </button>
                       </div>
                     </div>
@@ -386,9 +372,9 @@ const SlidingDoorLoginPage = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2, duration: 0.8 }}
                 >
-                  <div className="max-w-md mx-auto w-full">
+                  <div className={`max-w-md mx-auto w-full`}>
                     <motion.h2 
-                      className="text-3xl md:text-4xl lg:text-5xl font-bold mb-2 text-white"
+                      className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-2${isDarkMode ? 'text-white' : 'text-black'}`}
                       initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
@@ -421,7 +407,9 @@ const SlidingDoorLoginPage = () => {
                             type="text" 
                             value={signupData.name}
                             onChange={(e) => setSignupData({ ...signupData, name: e.target.value })}
-                            className="w-full pl-10 pr-4 py-3 bg-white/10 border border-[#06c1ff]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06c1ff] text-white placeholder-white/60 backdrop-blur-sm transition-all duration-300 hover:border-[#06c1ff]/50" 
+                            className={`w-full pl-10 pr-4 py-3 bg-white/10 border border-[#06c1ff]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06c1ff] backdrop-blur-sm transition-all duration-300 hover:border-[#06c1ff]/50 ${
+                              isDarkMode ? 'text-white placeholder-white/60' : 'text-gray-900 placeholder-gray-500'
+                            }`}
                             placeholder="Enter your full name"
                           />
                         </div>
@@ -437,7 +425,9 @@ const SlidingDoorLoginPage = () => {
                             type="email" 
                             value={signupData.email}
                             onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
-                            className="w-full pl-10 pr-4 py-3 bg-white/10 border border-[#06c1ff]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06c1ff] text-white placeholder-white/60 backdrop-blur-sm transition-all duration-300 hover:border-[#06c1ff]/50" 
+                            className={`w-full pl-10 pr-4 py-3 bg-white/10 border border-[#06c1ff]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06c1ff] backdrop-blur-sm transition-all duration-300 hover:border-[#06c1ff]/50 ${
+                              isDarkMode ? 'text-white placeholder-white/60' : 'text-gray-900 placeholder-gray-500'
+                            }`}
                             placeholder="Enter your email"
                           />
                         </div>
@@ -453,7 +443,9 @@ const SlidingDoorLoginPage = () => {
                             type="password" 
                             value={signupData.password}
                             onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
-                            className="w-full pl-10 pr-4 py-3 bg-white/10 border border-[#06c1ff]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06c1ff] text-white placeholder-white/60 backdrop-blur-sm transition-all duration-300 hover:border-[#06c1ff]/50" 
+                            className={`w-full pl-10 pr-4 py-3 bg-white/10 border border-[#06c1ff]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06c1ff] backdrop-blur-sm transition-all duration-300 hover:border-[#06c1ff]/50 ${
+                              isDarkMode ? 'text-white placeholder-white/60' : 'text-gray-900 placeholder-gray-500'
+                            }`}
                             placeholder="Create a password"
                           />
                         </div>
@@ -479,28 +471,18 @@ const SlidingDoorLoginPage = () => {
                       </div>
                     )}
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
-                      <button 
-                        onClick={() => navigate('/face-auth')}
-                        className="inline-flex justify-center items-center py-3 px-4 border border-[#06c1ff]/40 rounded-lg bg-white/5 hover:bg-white/15 hover:border-[#06c1ff]/60 transition-all duration-300 text-white hover:shadow-md"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-[#06c1ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <circle cx="12" cy="8" r="4"/>
-                          <path d="M12 14c-4.42 0-8 1.79-8 4v2h16v-2c0-2.21-3.58-4-8-4z"/>
-                        </svg>
-                        <span>Face ID</span>
-                      </button>
-
-                      <button 
-                        onClick={() => navigate('/finger-auth')}
-                        className="inline-flex justify-center items-center py-3 px-4 border border-[#06c1ff]/40 rounded-lg bg-white/5 hover:bg-white/15 hover:border-[#06c1ff]/60 transition-all duration-300 text-white hover:shadow-md"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-[#06c1ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M12 11c1.66 0 3-1.34 3-3S13.66 5 12 5s-3 1.34-3 3 1.34 3 3 3zm0 1c-1.84 0-3.56.5-5.03 1.37-.61.36-.97 1.02-.97 1.72V16h12v-.91c0-.7-.36-1.36-.97-1.72C15.56 12.5 13.84 12 12 12zm0-8c3.31 0 6 2.69 6 6 0 1.54-.58 2.94-1.53 4H7.53C6.58 12.94 6 11.54 6 10c0-3.31 2.69-6 6-6z"/>
-                        </svg>
-                        <span>Fingerprint</span>
-                      </button>
-                    </div>
+                    <div className="mt-4">
+                        <button 
+                          onClick={() => navigate('/face-auth')}
+                          className={`w-full inline-flex justify-center items-center py-3 px-4 border border-[#06c1ff]/40 rounded-lg bg-white/5 hover:bg-white/15 hover:border-[#06c1ff]/60 transition-all duration-300 ${isDarkMode ? 'text-white' : 'text-gray-800'} hover:shadow-md`}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-2 ${isDarkMode ? 'text-[#06c1ff]' : 'text-gray-600'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="8" r="4"/>
+                            <path d="M12 14c-4.42 0-8 1.79-8 4v2h16v-2c0-2.21-3.58-4-8-4z"/>
+                          </svg>
+                          <span>Face ID</span>
+                        </button>
+                      </div>
                   </div>
                 </motion.div>
                 

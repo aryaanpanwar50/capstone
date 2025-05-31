@@ -17,6 +17,7 @@ function AllGames() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("name");
+  const [isFiltering, setIsFiltering] = useState(false); // New state for filter loading
 
   // Categories for filtering
   const categories = [
@@ -58,39 +59,48 @@ function AllGames() {
 
   // Filter and sort games
   useEffect(() => {
-    let filtered = games;
+    const filterGames = async () => {
+      setIsFiltering(true);
+      
+      // Simulate processing time for smoother UX
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      let filtered = games;
 
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(game =>
-        game.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        game.description?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
+      // Filter by search term
+      if (searchTerm) {
+        filtered = filtered.filter(game =>
+          game.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          game.description?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
 
-    // Filter by category
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter(game =>
-        game.category?.toLowerCase() === selectedCategory.toLowerCase()
-      );
-    }
+      // Filter by category
+      if (selectedCategory !== "all") {
+        filtered = filtered.filter(game =>
+          game.category?.toLowerCase() === selectedCategory.toLowerCase()
+        );
+      }
 
-    // Sort games
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "name":
-          return (a.title || "").localeCompare(b.title || "");
-        case "popularity":
-          return (b.plays || 0) - (a.plays || 0);
-        case "newest":
-          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-        default:
+      // Sort games
+      filtered.sort((a, b) => {
+        switch (sortBy) {
+          case "name":
+            return (a.title || "").localeCompare(b.title || "");
+          case "popularity":
+            return (b.plays || 0) - (a.plays || 0);
+          case "newest":
+            return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+          default:
             return 0;
         }
-    });
+      });
 
-    setFilteredGames(filtered);
-    
+      setFilteredGames(filtered);
+      setIsFiltering(false);
+    };
+
+    filterGames();
   }, [games, searchTerm, selectedCategory, sortBy]);
 
   if (loading) {
@@ -273,16 +283,32 @@ function AllGames() {
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-              {filteredGames.map((game, index) => (
-                <motion.div
-                  key={game._id || game.id || index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 * (index % 12) }}
-                >
-                  <GameCard game={game} />
-                </motion.div>
-              ))}
+              {isFiltering ? (
+                // Loading skeleton
+                Array.from({ length: 12 }).map((_, index) => (
+                  <motion.div
+                    key={`skeleton-${index}`}
+                    className={`rounded-xl ${theme.cardBg} ${theme.border} border-2 aspect-[3/4] animate-pulse`}
+                  >
+                    <div className="w-full aspect-video bg-gray-200/10 rounded-t-lg" />
+                    <div className="p-4 space-y-3">
+                      <div className="h-4 bg-gray-200/10 rounded w-2/3" />
+                      <div className="h-3 bg-gray-200/10 rounded w-1/2" />
+                    </div>
+                  </motion.div>
+                ))
+              ) : (
+                filteredGames.map((game, index) => (
+                  <motion.div
+                    key={game._id || game.id || index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 * (index % 12) }}
+                  >
+                    <GameCard game={game} />
+                  </motion.div>
+                ))
+              )}
             </div>
           )}
         </motion.section>
