@@ -38,12 +38,16 @@ const verifyAuth = async () => {
     const [regularAuthResponse, faceAuthResponse] = await Promise.all([
       fetch(`${API_URL}/user/check`, fetchOptions),
       fetch(`${API_URL}/faceAuth/verify-auth`, fetchOptions),
-      console.log(regularAuthResponse.ok || faceAuthResponse.ok)
+      
     ]);
 
     return regularAuthResponse.ok || faceAuthResponse.ok;
   } catch (error) {
-    console.error('Auth verification failed:', error);
+    console.error('Auth verification failed:', {
+        message: error.message,
+        stack: error.stack,
+        location: 'verifyAuth function'
+    });
     return false;
   }
 };
