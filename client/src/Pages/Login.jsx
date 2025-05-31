@@ -52,7 +52,7 @@ const SlidingDoorLoginPage = () => {
     e.preventDefault();
     setError('');
 
-    for (const baseUrl of API_URLS) {
+    for (const baseUrl of API_URL) {
         try {
             const response = await fetch(`${baseUrl}/user/register`, {
                 method: 'POST',
