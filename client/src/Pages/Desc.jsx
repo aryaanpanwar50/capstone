@@ -32,7 +32,7 @@ const Desc = () => {
   const [comments, setComments] = useState([]);
   const [addComments, setAddComments] = useState("");
   const [commentLoading, setCommentLoading] = useState(false);
-  // const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editText, setEditText] = useState("");
 
@@ -172,21 +172,21 @@ const Desc = () => {
   };
 
   // Add useEffect to fetch user data
-  // useEffect(() => {
-  //   const fetchUser = async () => {
-  //     try {
-  //       const response = await axios.get("https://capstone-pbgi.onrender.com/user/me", {
-  //         withCredentials: true,
-  //       });
-  //       setCurrentUser(response.data.user);
-  //       console.log(response.data.user);
-  //     } catch (error) {
-  //       console.error("Failed to fetch user:", error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get("https://capstone-pbgi.onrender.com/user/me", {
+          withCredentials: true,
+        });
+        setCurrentUser(response.data.user);
+        console.log(response.data.user);
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+      }
+    };
 
-  //   fetchUser();
-  // }, []);
+    fetchUser();
+  }, []);
 
   const deletComment = async (commentId) => {
     try {
