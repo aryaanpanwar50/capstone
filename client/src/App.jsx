@@ -16,22 +16,22 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react'
 
 
 // Handle auth callback
-// const AuthCallback = () => {
-//   const location = useLocation();
-//   const navigate = useNavigate();
+const AuthCallback = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
 
-//   useEffect(() => {
-//     const params = new URLSearchParams(location.search);
-//     const token = params.get('token');
-//     if (token) {
-//       navigate('/home');
-//     } else {
-//       navigate('/login');
-//     }
-//   }, [location, navigate]);
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+    if (token) {
+      navigate('/home');
+    } else {
+      navigate('/login');
+    }
+  }, [location, navigate]);
 
-//   return <div>Loading...</div>;
-// };
+  return <div>Loading...</div>;
+};
 
 const verifyAuth = async () => {
   try {
@@ -40,7 +40,7 @@ const verifyAuth = async () => {
       fetch(`${API_URL}/faceAuth/verify-auth`, fetchOptions),
       
     ]);
-
+    console.log(regularAuthResponse, faceAuthResponse)
     return regularAuthResponse.ok || faceAuthResponse.ok;
   } catch (error) {
     console.error('Auth verification failed:', {
