@@ -156,9 +156,9 @@ function App() {
           } />
 
           <Route path="/home" element={
-            <ProtectedRoute>
+            
               <Home />
-            </ProtectedRoute>
+            
           } />
           <Route path='/top-charts' element={
             <ProtectedRoute>
