@@ -46,6 +46,7 @@ const verifyAuth = async () => {
       })
     ]);
 
+    console.log(responses)
     return responses.some(response => 
       response.status === 'fulfilled' && response.value.ok
     );
