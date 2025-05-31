@@ -129,9 +129,9 @@ const AuthRoute = ({ children }) => {
   return children;
 };
 
-AuthRoute.propTypes = {
-  children: PropTypes.node.isRequired,
-};
+// AuthRoute.propTypes = {
+//   children: PropTypes.node.isRequired,
+// };
 
 function App() {
   return (
