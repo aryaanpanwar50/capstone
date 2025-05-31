@@ -32,7 +32,7 @@ const Desc = () => {
   const [comments, setComments] = useState([]);
   const [addComments, setAddComments] = useState("");
   const [commentLoading, setCommentLoading] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
+  // const [currentUser, setCurrentUser] = useState(null);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editText, setEditText] = useState("");
 
@@ -63,7 +63,7 @@ const Desc = () => {
       try {
         const startTime = Date.now();
         delete axios.defaults.headers.common["Origin"];
-        const response = await axios.get(`http://localhost:8080/games/${id}`, {
+        const response = await axios.get(`https://capstone-pbgi.onrender.com/games/${id}`, {
           withCredentials: true,
         });
 
@@ -72,7 +72,7 @@ const Desc = () => {
 
         if (game.category) {
           const relatedResponse = await axios.get(
-            `http://localhost:8080/games/filter/${game.category}?limit=4`,
+            `https://capstone-pbgi.onrender.com/games/filter/${game.category}?limit=4`,
             { withCredentials: true }
           );
           console.log(game.category);
@@ -104,7 +104,7 @@ const Desc = () => {
     const fetchComment = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/comments/${id}`,
+          `https://capstone-pbgi.onrender.com/comments/${id}`,
           {
             withCredentials: true,
           }
@@ -143,14 +143,14 @@ const Desc = () => {
     try {
       // Post the new comment
       await axios.post(
-        `http://localhost:8080/comments/${id}`,
+        `https://capstone-pbgi.onrender.com/comments/${id}`,
         { text: addComments },
         { withCredentials: true }
       );
 
       // Fetch updated comments
       const updatedCommentsResponse = await axios.get(
-        `http://localhost:8080/comments/${id}`,
+        `https://capstone-pbgi.onrender.com/comments/${id}`,
         { withCredentials: true }
       );
 
@@ -172,30 +172,30 @@ const Desc = () => {
   };
 
   // Add useEffect to fetch user data
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get("http://localhost:8080/user/me", {
-          withCredentials: true,
-        });
-        setCurrentUser(response.data.user);
-        console.log(response.data.user);
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchUser = async () => {
+  //     try {
+  //       const response = await axios.get("https://capstone-pbgi.onrender.com/user/me", {
+  //         withCredentials: true,
+  //       });
+  //       setCurrentUser(response.data.user);
+  //       console.log(response.data.user);
+  //     } catch (error) {
+  //       console.error("Failed to fetch user:", error);
+  //     }
+  //   };
 
-    fetchUser();
-  }, []);
+  //   fetchUser();
+  // }, []);
 
   const deletComment = async (commentId) => {
     try {
-      await axios.delete(`http://localhost:8080/comments/${commentId}`, {
+      await axios.delete(`https://capstone-pbgi.onrender.com/comments/${commentId}`, {
         withCredentials: true,
       });
 
       const updatedCommentsResponse = await axios.get(
-        `http://localhost:8080/comments/${id}`,
+        `https://capstone-pbgi.onrender.com/comments/${id}`,
         { withCredentials: true }
       );
 
@@ -210,14 +210,14 @@ const Desc = () => {
 
     try {
       await axios.put(
-        `http://localhost:8080/comments/${commentId}`,
+        `https://capstone-pbgi.onrender.com/comments/${commentId}`,
         { text: editText },
         { withCredentials: true }
       );
 
       // Fetch updated comments
       const updatedCommentsResponse = await axios.get(
-        `http://localhost:8080/comments/${id}`,
+        `https://capstone-pbgi.onrender.com/comments/${id}`,
         { withCredentials: true }
       );
 

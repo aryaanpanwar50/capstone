@@ -37,7 +37,7 @@ function AllGames() {
     const fetchGames = async () => {
       try {
         const startTime = Date.now();
-        const response = await axios.get("http://localhost:8080/games", {
+        const response = await axios.get("https://capstone-pbgi.onrender.com/games", {
           withCredentials: true,
         });
         setGames(response.data.games);

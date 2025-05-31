@@ -13,7 +13,7 @@ const GameCard = ({game}) => {
     if (!game._id) return;
 
     try {
-      const response = await fetch(`http://localhost:8080/games/${game._id}/count`, {
+      const response = await fetch(`https://capstone-pbgi.onrender.com/games/${game._id}/count`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'

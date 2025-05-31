@@ -21,7 +21,7 @@ passport.use(new GoogleStrategy({
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: process.env.NODE_ENV === 'production'
         ? 'http://localhost:8080/auth/google/callback'
-        : 'http://localhost:8080/auth/google/callback',
+        : 'https://capstone-pbgi.onrender.com/auth/google/callback',
     proxy: true
 },
 async (accessToken, refreshToken, profile, done) => {

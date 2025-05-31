@@ -16,7 +16,7 @@ const TopChart = () => {
       try {
         const startTime = Date.now()
         setLoading(true);
-        const response = await fetch('http://localhost:8080/games/counts');
+        const response = await fetch('https://capstone-pbgi.onrender.com/games/counts');
         if (!response.ok) {
           throw new Error(`Server responded with status: ${response.status}`);
         }
@@ -43,7 +43,7 @@ const TopChart = () => {
 
         // Fetch full game details for the filtered games
         const gameDetailsPromises = filteredGames.map(async (game) => {
-          const detailResponse = await fetch(`http://localhost:8080/games/${game._id}`);
+          const detailResponse = await fetch(`https://capstone-pbgi.onrender.com/games/${game._id}`);
           if (!detailResponse.ok) return null;
           const detailData = await detailResponse.json();
           return {

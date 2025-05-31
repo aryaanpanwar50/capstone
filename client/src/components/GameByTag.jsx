@@ -17,7 +17,7 @@ function GameByTag() {
     const fetchGames = async () => {
       try {
         const startTime = Date.now()
-        const response = await axios.get(`http://localhost:8080/games/filter/${category}`, {
+        const response = await axios.get(`https://capstone-pbgi.onrender.com/games/filter/${category}`, {
           withCredentials: true,
         })
         

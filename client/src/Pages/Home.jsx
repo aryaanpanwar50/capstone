@@ -127,7 +127,7 @@ const GameGrid = () => {
   useEffect(() => {
     const fetchGames = async () => {
       try {
-        const response = await fetch('http://localhost:8080/games', {
+        const response = await fetch('https://capstone-pbgi.onrender.com/games', {
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json'

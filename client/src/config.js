@@ -1,11 +1,11 @@
-export const API_URL = 'http://localhost:8080';
+export const API_URL = 'https://capstone-pbgi.onrender.com';
 
 export const fetchOptions = {
   credentials: 'include',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-    // 'Origin': 'http://localhost:5173'
+    // 'Origin': 'https://capstone-ochre-kappa.vercel.app'
   },
   mode: 'cors'
 };
