@@ -38,11 +38,22 @@ const verifyAuth = async () => {
     const responses = await Promise.allSettled([
       fetch(`${API_URL}/user/check`, {
         ...fetchOptions,
-        method: 'GET'
+        method: 'GET',
+        credentials: 'include', // Ensure credentials are included
+        headers: {
+          ...fetchOptions.headers,
+          // Add token from cookie if available
+          ...(document.cookie.includes('token=') && {
+            'Authorization': `Bearer ${document.cookie.split('; ')
+              .find(row => row.startsWith('token='))
+              ?.split('=')[1]}`
+          })
+        }
       }),
       fetch(`${API_URL}/faceAuth/verify-auth`, {
         ...fetchOptions,
-        method: 'GET'
+        method: 'GET',
+        credentials: 'include'
       })
     ]);
 
@@ -51,11 +62,7 @@ const verifyAuth = async () => {
       response.status === 'fulfilled' && response.value.ok
     );
   } catch (error) {
-    console.error('Auth verification failed:', {
-      message: error.message,
-      stack: error.stack,
-      location: 'verifyAuth function'
-    });
+    console.error('Auth verification failed:', error);
     return false;
   }
 };

@@ -17,11 +17,22 @@ const Header = () => {
         const responses = await Promise.allSettled([
           fetch(`${API_URL}/user/check`, {
             ...fetchOptions,
-            method: 'GET'
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              ...fetchOptions.headers,
+              // Add token from cookie if available
+              ...(document.cookie.includes('token=') && {
+                'Authorization': `Bearer ${document.cookie.split('; ')
+                  .find(row => row.startsWith('token='))
+                  ?.split('=')[1]}`
+              })
+            }
           }),
           fetch(`${API_URL}/faceAuth/verify-auth`, {
             ...fetchOptions,
-            method: 'GET'
+            method: 'GET',
+            credentials: 'include'
           })
         ]);
 

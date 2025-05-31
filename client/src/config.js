@@ -12,6 +12,7 @@ export const fetchOptions = {
 export async function tryAPI(path, customOptions = {}) {
   try {
     const options = {
+      credentials: 'include', // Ensure this is always set
       ...fetchOptions,
       ...customOptions,
       headers: {
@@ -19,6 +20,12 @@ export async function tryAPI(path, customOptions = {}) {
         ...customOptions.headers
       }
     };
+    
+    // Add token from cookie if available
+    const token = document.cookie.split('; ').find(row => row.startsWith('token='));
+    if (token) {
+      options.headers['Authorization'] = `Bearer ${token.split('=')[1]}`;
+    }
     
     const response = await fetch(`${API_URL}${path}`, options);
     if (response.ok) return response;
