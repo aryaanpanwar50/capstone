@@ -21,7 +21,7 @@ app.use(cookieParser());
 // Enable CORS with specific origins and configuration
 // Update the CORS configuration
 app.use(cors({
-  origin: 'https://capstone-ochre-kappa.vercel.app',
+  origin: ' http://localhost:5173',
   credentials: true,
   preflightContinue: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],

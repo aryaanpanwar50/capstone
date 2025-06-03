@@ -46,7 +46,7 @@ authRouter.get('/google/callback',
         res.cookie('token', accessToken, cookieOptions);
         res.cookie('refreshToken', refreshToken, refreshCookieOptions);
 
-        const frontendURL = 'https://capstone-ochre-kappa.vercel.app';
+        const frontendURL = ' http://localhost:5173';
             
         res.redirect(`${frontendURL}/auth/callback?token=${accessToken}`);
     }
