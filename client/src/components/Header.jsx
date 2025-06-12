@@ -1,75 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Menu, X, Home, BarChart2, Grid, Gamepad, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { API_URL, fetchOptions } from '../config';
+import { API_URL } from '../config';
+import axios from 'axios';
 import { useTheme } from '../context/ThemeContext';
 import ThemeToggle from './ThemeToggle';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
   const { theme } = useTheme();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const responses = await Promise.allSettled([
-          fetch(`${API_URL}/user/check`, {
-            ...fetchOptions,
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-              ...fetchOptions.headers,
-              // Add token from cookie if available
-              ...(document.cookie.includes('token=') && {
-                'Authorization': `Bearer ${document.cookie.split('; ')
-                  .find(row => row.startsWith('token='))
-                  ?.split('=')[1]}`
-              })
-            }
-          }),
-          fetch(`${API_URL}/faceAuth/verify-auth`, {
-            ...fetchOptions,
-            method: 'GET',
-            credentials: 'include'
-          })
-        ]);
-
-        const isAuthenticated = responses.some(response => 
-          response.status === 'fulfilled' && response.value.ok
-        );
-
-        setIsAuthenticated(isAuthenticated);
-        if (!isAuthenticated && window.location.pathname !== '/login') {
-          navigate('/login');
-        }
-      } catch (error) {
-        console.error('Auth check error:', error);
-        setIsAuthenticated(false);
-        navigate('/login');
-      }
-    };
-
-    checkAuth();
-  }, [navigate]);
 
 
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${API_URL}/user/logout`, {
-        ...fetchOptions,
-        method: 'POST'
+      const response = await axios.post(`${API_URL}/user/logout`, {}, {
+        withCredentials: true
       });
 
-      if (response.ok) {
+      if (response.status === 200) {
         localStorage.clear();
         sessionStorage.clear();
-        setIsAuthenticated(false);
         window.location.href = '/login';
       } else {
-        console.error('Logout failed:', await response.text());
+        console.error('Logout failed:', response.data);
         alert('Logout failed. Please try again.');
       }
     } catch (error) {
@@ -193,14 +148,14 @@ const Header = () => {
 
           
           {/* Mobile Auth Button */}
-          {isAuthenticated && (
+          
             <button
               onClick={handleLogout}
               className="w-full mt-4 px-4 py-3 bg-gradient-to-r from-[#06c1ff] to-[#0b8fd8] text-[#0b2d72] rounded-lg text-sm font-medium shadow-md hover:shadow-lg hover:shadow-[#06c1ff]/20 transition-all"
             >
               Logout
             </button>
-          )}
+          
         </div>
       </div>
     </header>

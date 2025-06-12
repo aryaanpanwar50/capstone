@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import './App.css'
 import Login from './Pages/Login'
 import Home from './Pages/Home'
@@ -39,10 +38,9 @@ const verifyAuth = async () => {
       fetch(`${API_URL}/user/check`, {
         ...fetchOptions,
         method: 'GET',
-        credentials: 'include', // Ensure credentials are included
+        credentials: 'include',
         headers: {
           ...fetchOptions.headers,
-          // Add token from cookie if available
           ...(document.cookie.includes('token=') && {
             'Authorization': `Bearer ${document.cookie.split('; ')
               .find(row => row.startsWith('token='))
@@ -57,10 +55,15 @@ const verifyAuth = async () => {
       })
     ]);
 
-    console.log(responses)
-    return responses.some(response => 
-      response.status === 'fulfilled' && response.value.ok
+    // Check for successful responses and parse JSON
+    const validResponses = await Promise.all(
+      responses
+        .filter(r => r.status === 'fulfilled' && r.value.ok)
+        .map(r => r.value.json().catch(() => ({ authenticated: false })))
     );
+
+    return validResponses.some(data => data.authenticated !== false);
+
   } catch (error) {
     console.error('Auth verification failed:', error);
     return false;
@@ -73,26 +76,37 @@ const ProtectedRoute = ({ children }) => {
   const [isVerifying, setIsVerifying] = useState(true);
 
   useEffect(() => {
+    let timeoutId;
+    
     const verify = async () => {
-      const startTime = Date.now()
-      const isAuthenticated = await verifyAuth();
-      if (!isAuthenticated) {
+      const startTime = Date.now();
+      try {
+        const isAuthenticated = await verifyAuth();
+        
+        if (!isAuthenticated) {
+          setIsVerifying(false); // Immediately update state
+          navigate('/login', { replace: true });
+          return;
+        }
+
+        const elapsedTime = Date.now() - startTime;
+        const remainingDelay = Math.max(0, 2000 - elapsedTime);
+        
+        timeoutId = setTimeout(() => {
+          setIsVerifying(false);
+        }, remainingDelay);
+      } catch (error) {
+        console.error('Authentication verification error:', error);
+        setIsVerifying(false);
         navigate('/login', { replace: true });
-        return;
       }
-
-      
-        const elapsedTime = Date.now() - startTime
-        const remainingDelay = Math.max(0, 2000 - elapsedTime)
-        
-        setTimeout(() => {
-          setIsVerifying(false)
-        }, remainingDelay)
-
-        
     };
 
     verify();
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [navigate]);
 
   if (isVerifying) {
@@ -131,18 +145,18 @@ const AuthRoute = ({ children }) => {
 
   useEffect(() => {
     const check = async () => {
-      try{
+      try {
         const isAuthenticated = await verifyAuth();
-      if (isAuthenticated) {
-        navigate('/home', { replace: true });
-        return;
+        if (isAuthenticated) {
+          navigate('/home', { replace: true });
+          return;
+        }
+        console.log(isAuthenticated);
+      } catch (error) {
+        console.error(error.message);
+      } finally {
+        setIsVerifying(false);
       }
-      console.log(isAuthenticated)
-      setIsVerifying(false);
-      }catch(error){
-        console.error(error.message)
-      }
-      
     };
 
     check();
@@ -156,7 +170,7 @@ const AuthRoute = ({ children }) => {
 };
 
 // AuthRoute.propTypes = {
-//   children: PropTypes.node.isRequired,
+//   children: PropTypes.node isRequired,
 // };
 
 function App() {
@@ -189,8 +203,16 @@ function App() {
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/games/:id" element={<Desc />} />
           <Route path='/landing' element={<LandingPage/>}/>
-          <Route path='/games/filter/:category' element={<GameByTag></GameByTag>}/>
-          <Route path='/games' element={<AllGames></AllGames>}/>
+          <Route path='/games/filter/:category' element={
+            <ProtectedRoute>
+              <GameByTag />
+            </ProtectedRoute>
+          }/>
+          <Route path='/games' element={
+            <ProtectedRoute>
+              <AllGames />
+            </ProtectedRoute>
+          }/>
         </Routes>
       </Router>
     </ThemeProvider>

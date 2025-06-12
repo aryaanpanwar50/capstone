@@ -2,9 +2,11 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { Play, Star, Eye } from 'lucide-react';
+import { API_URL } from '../config';
+import axios from 'axios'
 
 const GameCard = ({game}) => {
-  const [localCount, setLocalCount] = useState(game.count || 0);
+  const [localCount, setLocalCount] = useState(game.count);
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
 
@@ -13,18 +15,14 @@ const GameCard = ({game}) => {
     if (!game._id) return;
 
     try {
-      const response = await fetch(`https://capstone-pbgi.onrender.com/games/${game._id}/count`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include'
+      const response = await axios.put(`${API_URL}/games/${game._id}/count`, {
+          withCredentials: true
       });
       
       if (response.ok) {
-        const data = await response.json();
-        setLocalCount(data.count);
+        setLocalCount(prev=>prev+1);
       }
+      
       // Navigate to game details page
       navigate(`/games/${game._id}`);
     } catch (error) {

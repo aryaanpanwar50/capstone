@@ -23,7 +23,7 @@ authRouter.get('/google', passport.authenticate('google', { scope: ['profile', '
 
 authRouter.get('/google/callback', 
     passport.authenticate('google', { 
-        failureRedirect: 'https://capstone-pbgi.onrender.com'
+        failureRedirect: 'http://localhost:8080'
     }),
     async (req, res) => {
         const user = await UserModel.findById(req.user._id).populate('friends');
@@ -46,7 +46,7 @@ authRouter.get('/google/callback',
         res.cookie('token', accessToken, cookieOptions);
         res.cookie('refreshToken', refreshToken, refreshCookieOptions);
 
-        const frontendURL = ' http://localhost:5173';
+        const frontendURL = 'http://localhost:5173';
             
         res.redirect(`${frontendURL}/auth/callback?token=${accessToken}`);
     }

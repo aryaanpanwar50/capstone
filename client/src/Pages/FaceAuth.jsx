@@ -10,7 +10,7 @@ import { API_URL } from '../config';
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common['Accept'] = 'application/json';
 axios.defaults.headers.common['Content-Type'] = 'application/json';
-axios.defaults.headers.common['Origin'] = 'https://capstone-ochre-kappa.vercel.app';
+
 
 const FaceAuth = () => {
     const videoRef = useRef(null);
@@ -70,7 +70,13 @@ const FaceAuth = () => {
                     videoRef.current.srcObject = stream;
                 }
             })
-            .catch((err) => console.error("Camera access error:", err));
+            .catch((err) => 
+                console.error("Camera access error:", err),
+                setVerificationStatus({
+                    success:false,
+                    message:"Camera access denied. Please allow camera permissions to use face authentication."
+                })
+        );
     };
 
     const stopCamera = () => {
@@ -81,6 +87,10 @@ const FaceAuth = () => {
     };
 
     const getFaceEmbedding = async () => {
+        if (!videoRef.current || !videoRef.current.readyState || videoRef.current.readyState < 2) {
+            console.error("Video not ready for face detection");
+            return null; // Video not ready yet
+        }
         const detection = await faceapi.detectSingleFace(videoRef.current, new faceapi.TinyFaceDetectorOptions())
             .withFaceLandmarks()
             .withFaceDescriptor();
@@ -88,30 +98,58 @@ const FaceAuth = () => {
     };
 
     const register = async () => {
-        if (!email) return alert("Enter email!");
-
-        const faceEmbedding = await getFaceEmbedding();
-        if (!faceEmbedding) return alert("Face not detected!");
-
-        for (const baseUrl of API_URLS) {
-            try {
-                const res = await axios.post(`${baseUrl}/faceAuth/face/signup`, { 
-                    email, 
-                    faceEmbedding 
-                });
-                stopCamera();
-                alert(res.data.message);
-                return;
-            } catch (error) {
-                console.log(`Failed with ${baseUrl}:`, error);
-            }
+        if (!email){
+            setVerificationStatus({
+                success:false,
+                message:"Please enter your email address"
+            });
+            return
         }
-        alert("Registration failed with all endpoints");
+        setIsVerifying(true);
+
+        try {
+            const faceEmbedding = await getFaceEmbedding();
+            if (!faceEmbedding) {
+                setVerificationStatus({
+                    success: false,
+                    message: "No face detected in camera"
+                });
+                setIsVerifying(false);
+                return;
+            }
+
+            const res = await axios.post(`${API_URL}/faceAuth/face/signup`, { 
+                email, 
+                faceEmbedding 
+            });
+            stopCamera();
+            setVerificationStatus({
+                success: true,
+                message: res.data.message
+            });
+        } catch (error) {
+            console.error("Registration error:", error);
+            stopCamera();
+            setVerificationStatus({
+                success: false,
+                message: error.response?.data?.message || "Registration failed"
+            });
+        } finally {
+            setIsVerifying(false);
+        }
     };
 
     const login = async () => {
         if (!email) return alert("Enter email!");
+        if (!/\S+@\S+\.\S+/.test(email)) {
+            setVerificationStatus({
+            success: false,
+            message: "Please enter a valid email address"
+        });
+        return;
+        }
         setIsVerifying(true);
+        setVerificationStatus(null);
 
         try {
             const faceEmbedding = await getFaceEmbedding();
@@ -120,6 +158,7 @@ const FaceAuth = () => {
                     success: false, 
                     message: "No face detected in camera" 
                 });
+                setIsVerifying(false);
                 return;
             }
 

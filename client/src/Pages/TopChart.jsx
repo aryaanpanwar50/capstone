@@ -3,6 +3,7 @@ import GameCard from '../components/GameCard';
 import Header from '../components/Header';
 import { useTheme } from '../context/ThemeContext';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react'
+import { API_URL } from '../config';
 
 const TopChart = () => {
   const [games, setGames] = useState([]);
@@ -16,7 +17,8 @@ const TopChart = () => {
       try {
         const startTime = Date.now()
         setLoading(true);
-        const response = await fetch('https://capstone-pbgi.onrender.com/games/counts');
+        setError(null);
+        const response = await fetch(`${API_URL}/games/counts`);
         if (!response.ok) {
           throw new Error(`Server responded with status: ${response.status}`);
         }
@@ -43,7 +45,7 @@ const TopChart = () => {
 
         // Fetch full game details for the filtered games
         const gameDetailsPromises = filteredGames.map(async (game) => {
-          const detailResponse = await fetch(`https://capstone-pbgi.onrender.com/games/${game._id}`);
+          const detailResponse = await fetch(`${API_URL}/games/${game._id}`);
           if (!detailResponse.ok) return null;
           const detailData = await detailResponse.json();
           return {
@@ -51,16 +53,17 @@ const TopChart = () => {
             count: game.count || 0
           };
         });
+        const gameDetails = await Promise.all(gameDetailsPromises);
         const elapsedTime = Date.now() - startTime
         const remainingDelay = Math.max(0, 3000 - elapsedTime)
         setTimeout(() => {
+          setGames(gameDetails.filter(game => game !== null));
           setLoading(false)
         }, remainingDelay)
 
-        const gameDetails = await Promise.all(gameDetailsPromises);
-        setGames(gameDetails.filter(game => game !== null));
       } catch (error) {
         setError(error.message);
+        setLoading(false)
       } 
     };
 
@@ -79,12 +82,16 @@ const TopChart = () => {
      <div className={`min-h-screen ${theme.background}`}>
         <Header />
         <div className="flex flex-col justify-center items-center h-screen">
-          <div className="w-102 h-102 mb-4"> 
+          <div className="w-96 h-96 mb-4"> 
             <DotLottieReact
               src="https://lottie.host/012ee33b-d9b9-443f-975a-62aad5995217/S8sXukPLpf.lottie"
               loop
               autoplay
               className="w-full h-full"
+              onError={() => {console.error("Failed to load animation");
+                setError("Failed to load animation. Please refresh the page.");
+              }}
+              fallback={<div className="animate-pulse bg-gray-300 w-full h-full rounded-lg"></div>}
             />
           </div>
   

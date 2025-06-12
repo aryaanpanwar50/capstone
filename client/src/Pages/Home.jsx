@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import GameCard from '../components/GameCard';
 import { Gamepad, Flame, Star, TrendingUp } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { API_URL } from '../config';
 
 // Featured Games Carousel
 const FeaturedGames = () => {
@@ -74,7 +75,7 @@ const FeaturedGames = () => {
 };
 
 // Enhanced Categories component
-const Categories = ({ onCategoryClick, selectedCategory }) => {
+const Categories = () => {
   const { theme } = useTheme();
   const categories = [
     { icon: "🎮", name: "All Games", id: "all" },
@@ -100,11 +101,7 @@ const Categories = ({ onCategoryClick, selectedCategory }) => {
             key={index}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`min-w-[120px] py-3 px-4 rounded-xl cursor-pointer transition-all duration-300 flex flex-col items-center justify-center gap-2 border-2 ${
-              selectedCategory === category.id 
-                ? `bg-[#06c1ff]/10 border-[#06c1ff]/50 text-[#06c1ff]` 
-                : `${theme.cardBg} ${theme.border} ${theme.secondary} hover:bg-[#06c1ff]/5 hover:border-[#06c1ff]/20 hover:text-[#06c1ff]`
-            }`}
+            className={`min-w-[120px] py-3 px-4 rounded-xl cursor-pointer transition-all duration-300 flex flex-col items-center justify-center gap-2 border-2 ${theme.cardBg} ${theme.border} ${theme.secondary} hover:bg-[#06c1ff]/5 hover:border-[#06c1ff]/20 hover:text-[#06c1ff]`}
            
           >
             <div className="text-2xl">{category.icon}</div>
@@ -127,7 +124,7 @@ const GameGrid = () => {
   useEffect(() => {
     const fetchGames = async () => {
       try {
-        const response = await fetch('https://capstone-pbgi.onrender.com/games', {
+        const response = await fetch(`${API_URL}/games`, {
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json'
@@ -139,7 +136,7 @@ const GameGrid = () => {
         }
         
         const data = await response.json();
-        setGames(data.games );
+        setGames(data.games || []);
       } catch (error) {
         setError('Failed to fetch games');
         console.error('Error fetching games:', error);
@@ -156,7 +153,7 @@ const GameGrid = () => {
       {error && <div className="text-red-500">{error}</div>}
       {!error && games.length === 0 && <div>Loading games...</div>}
       {Array.isArray(games) && games.map(game => (
-        <GameCard key={game.id} game={game}></GameCard>
+        <GameCard key={game._id} game={game}></GameCard>
       ))}
     </div>
   );
@@ -201,12 +198,10 @@ const TrendingGames = () => {
 };
 
 function Home() {
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  
   const { theme } = useTheme();
   
-  const handleCategoryClick = (categoryId) => {
-    setSelectedCategory(categoryId);
-  };
+
 
   return (
     <div className={`min-h-screen ${theme.background} ${theme.primary} transition-colors duration-300`}>
@@ -224,10 +219,7 @@ function Home() {
           <div className="lg:col-span-9">
             {/* Categories Section */}
             <section className="mb-12">
-              <Categories 
-                onCategoryClick={handleCategoryClick} 
-                selectedCategory={selectedCategory} 
-              />
+              <Categories/>
             </section>
             
             {/* Popular Games Section */}

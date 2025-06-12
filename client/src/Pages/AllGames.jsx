@@ -7,6 +7,7 @@ import axios from "axios";
 import { useTheme } from "../context/ThemeContext";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { Gamepad2, Grid3X3, Search, Filter, SortAsc } from 'lucide-react';
+import { API_URL } from "../config";
 
 function AllGames() {
   const { theme } = useTheme();
@@ -37,7 +38,7 @@ function AllGames() {
     const fetchGames = async () => {
       try {
         const startTime = Date.now();
-        const response = await axios.get("https://capstone-pbgi.onrender.com/games", {
+        const response = await axios.get(`${API_URL}/games`, {
           withCredentials: true,
         });
         setGames(response.data.games);

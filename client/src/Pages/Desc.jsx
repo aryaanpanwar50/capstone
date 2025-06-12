@@ -18,6 +18,7 @@ import {
   Info,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import { API_URL } from "../config";
 
 const Desc = () => {
   const { id } = useParams();
@@ -63,7 +64,7 @@ const Desc = () => {
       try {
         const startTime = Date.now();
         delete axios.defaults.headers.common["Origin"];
-        const response = await axios.get(`https://capstone-pbgi.onrender.com/games/${id}`, {
+        const response = await axios.get(`${API_URL}/games/${id}`, {
           withCredentials: true,
         });
 
@@ -72,7 +73,7 @@ const Desc = () => {
 
         if (game.category) {
           const relatedResponse = await axios.get(
-            `https://capstone-pbgi.onrender.com/games/filter/${game.category}?limit=4`,
+            `${API_URL}/games/filter/${game.category}?limit=4`,
             { withCredentials: true }
           );
           console.log(game.category);
@@ -104,7 +105,7 @@ const Desc = () => {
     const fetchComment = async () => {
       try {
         const response = await axios.get(
-          `https://capstone-pbgi.onrender.com/comments/${id}`,
+          `${API_URL}/comments/${id}`,
           {
             withCredentials: true,
           }
@@ -143,14 +144,14 @@ const Desc = () => {
     try {
       // Post the new comment
       await axios.post(
-        `https://capstone-pbgi.onrender.com/comments/${id}`,
+        `${API_URL}/comments/${id}`,
         { text: addComments },
         { withCredentials: true }
       );
 
       // Fetch updated comments
       const updatedCommentsResponse = await axios.get(
-        `https://capstone-pbgi.onrender.com/comments/${id}`,
+        `${API_URL}/comments/${id}`,
         { withCredentials: true }
       );
 
@@ -175,7 +176,7 @@ const Desc = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get("https://capstone-pbgi.onrender.com/user/me", {
+        const response = await axios.get(`${API_URL}/user/me`, {
           withCredentials: true,
         });
         setCurrentUser(response.data.user);
@@ -188,14 +189,14 @@ const Desc = () => {
     fetchUser();
   }, []);
 
-  const deletComment = async (commentId) => {
+  const deleteComment  = async (commentId) => {
     try {
-      await axios.delete(`https://capstone-pbgi.onrender.com/comments/${commentId}`, {
+      await axios.delete(`${API_URL}/comments/${commentId}`, {
         withCredentials: true,
       });
 
       const updatedCommentsResponse = await axios.get(
-        `https://capstone-pbgi.onrender.com/comments/${id}`,
+        `${API_URL}/comments/${id}`,
         { withCredentials: true }
       );
 
@@ -210,19 +211,19 @@ const Desc = () => {
 
     try {
       await axios.put(
-        `https://capstone-pbgi.onrender.com/comments/${commentId}`,
+        `${API_URL}/comments/${commentId}`,
         { text: editText },
         { withCredentials: true }
       );
 
       // Fetch updated comments
       const updatedCommentsResponse = await axios.get(
-        `https://capstone-pbgi.onrender.com/comments/${id}`,
+        `${API_URL}/comments/${id}`,
         { withCredentials: true }
       );
 
       setComments(updatedCommentsResponse.data);
-      // setEditingCommentId(null);
+      setEditingCommentId(null);
       setEditText("");
     } catch (error) {
       console.error("Failed to update comment:", error);
@@ -637,7 +638,7 @@ const Desc = () => {
                                       </button>
                                       <button
                                         onClick={() =>
-                                          deletComment(comment._id)
+                                          deleteComment (comment._id)
                                         }
                                         className="text-red-500 text-sm hover:text-red-400 hover:underline flex items-center gap-1"
                                       >

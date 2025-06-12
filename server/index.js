@@ -4,7 +4,6 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('./config/passport');
-const MongoStore  = require('connect-mongo');
 const { connectDB } = require('./config/db');
 const { userRouter, authRouter } = require('./routes/user.routes');
 const { gameRouter } = require('./routes/game.routes');
@@ -40,10 +39,6 @@ app.use(session({
     sameSite: 'none',
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   },
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URL,
-    collectionName: 'sessions'
-  })
 }));
 
 // Initialize Passport and restore authentication state from session

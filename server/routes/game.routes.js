@@ -23,7 +23,7 @@ gameRouter.get('/filter/:category', gameByCategory);
 // Protected routes - require authentication
 gameRouter.post("/add", verifyToken, addGame);
 gameRouter.patch("/update/:id", verifyToken, updateGame);
-gameRouter.patch("/:id/count", updateGameCount);
+gameRouter.put("/:id/count", updateGameCount);
 gameRouter.delete("/delete/:id", verifyToken, deleteGame);
 
 module.exports = { gameRouter };

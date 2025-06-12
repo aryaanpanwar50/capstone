@@ -12,7 +12,7 @@ const register = async (req, res) => {
         // Check if user already exists
         const existingUser = await UserModel.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ msg: 'User already exists' });
+            return res.status(400).json({ message: 'User already exists' });
         }
 
         const hash = await bcrypt.hash(password, 12);
@@ -26,7 +26,7 @@ const register = async (req, res) => {
         
         res.status(201).json({ 
             success: true,
-            msg: 'User registered successfully',
+            message: 'User registered successfully',
             user : user
         });
     } catch (error) {
@@ -46,7 +46,7 @@ const login = async (req, res) => {
         if (!user) {
             return res.status(404).json({ 
                 success: false,
-                msg: 'User not found' 
+                message: 'User not found' 
             });
         }
 
@@ -54,7 +54,7 @@ const login = async (req, res) => {
         if (!isMatch) {
             return res.status(401).json({ 
                 success: false,
-                msg: 'Invalid credentials' 
+                message: 'Invalid credentials' 
             });
         }
 
@@ -137,8 +137,14 @@ const logout = async (req, res) => {
  */
 const getCurrentUser = async (req, res) => {
     try {
-        // Get userId from token
-        const userId = req.user._id;
+        // Get userId from token with null check
+        const userId = req.user?._id;
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: 'User not authenticated'
+            });
+        }
         
         // Fetch the complete user data from database
         const user = await UserModel.findById(userId);
@@ -219,7 +225,7 @@ const refreshAccessToken = async (req, res) => {
 
         // Set new tokens in cookies
         res.cookie('token', newAccessToken, cookieOptions);
-        res.cookie('refreshToken', newRefreshCookieOptions);
+        res.cookie('refreshToken', newRefreshToken, refreshCookieOptions);
 
         res.json({
             success: true,
